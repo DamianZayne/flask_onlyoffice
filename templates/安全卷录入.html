@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>安全卷卷内材料目录</title>
+    <!-- Quill 富文本编辑器 CDN -->
+    <link href="/static/quill/quill.snow.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8B1A1A;
+            --primary-dark: #6B0F0F;
+            --bg-header: #FDF6F0;
+            --bg-row-odd: #FFFAF7;
+            --bg-row-even: #FFFFFF;
+            --text-dark: #1a1a1a;
+            --text-secondary: #5a5a5a;
+            --accent-line: #C0392B;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+            --radius: 4px;
+            --transition: 0.2s ease;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", "STSong", "SimSun", "宋体", serif;
+            background: #f0ece6;
+            background-image:
+                radial-gradient(ellipse at 50% 0%, rgba(139, 26, 26, 0.03) 0%, transparent 70%),
+                radial-gradient(ellipse at 85% 100%, rgba(139, 26, 26, 0.02) 0%, transparent 60%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 24px 16px 60px;
+            color: var(--text-dark);
+            -webkit-font-smoothing: antialiased;
+        }
+        .main-container {
+            width: 100%;
+            max-width: 860px;
+            background: #fffefc;
+            border-radius: 6px;
+            box-shadow: var(--shadow-md), 0 0 0 1px rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+            position: relative;
+        }
+        .main-container::before {
+            content: '';
+            display: block;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-line), #d4644a, var(--accent-line));
+            border-radius: 6px 6px 0 0;
+        }
+        .content-wrapper {
+            padding: 32px 36px 28px;
+        }
+        .header-section {
+            text-align: center;
+            margin-bottom: 28px;
+            position: relative;
+        }
+        .main-title {
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: var(--primary);
+            font-family: "STZhongsong", "SimSun", "PingFang SC", "Microsoft YaHei", serif;
+            line-height: 1.4;
+            margin-bottom: 6px;
+        }
+        .main-title-divider {
+            display: block;
+            width: 120px;
+            height: 2px;
+            background: var(--accent-line);
+            margin: 10px auto 0;
+            border-radius: 1px;
+        }
+        .subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            letter-spacing: 2px;
+            margin-top: 4px;
+            font-weight: 400;
+        }
+        .info-section {
+            background: #fefdfb;
+            border: 1.5px solid #e0d8cf;
+            border-radius: var(--radius);
+            padding: 18px 22px;
+            margin-bottom: 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px 24px;
+            position: relative;
+        }
+        @media (min-width: 600px) {
+            .info-section::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 50%;
+                bottom: 0;
+                width: 1px;
+                background: #e8e0d6;
+            }
+        }
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        .info-item-full {
+            grid-column: 1 / -1;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #4a3f35;
+            white-space: nowrap;
+            letter-spacing: 1px;
+            font-size: 13.5px;
+        }
+        .info-value {
+            flex: 1;
+            border: none;
+            border-bottom: 1.5px dashed #c5bdb2;
+            background: transparent;
+            padding: 5px 6px;
+            font-size: 14px;
+            color: var(--text-dark);
+            font-family: inherit;
+            letter-spacing: 0.5px;
+            transition: border-color var(--transition), background var(--transition);
+            min-width: 80px;
+            border-radius: 2px 2px 0 0;
+        }
+        .info-value:focus {
+            outline: none;
+            border-bottom-color: var(--accent-line);
+            border-bottom-style: solid;
+            background: #fffef9;
+        }
+        .info-value::placeholder {
+            color: #c5bfb5;
+            font-size: 13px;
+            letter-spacing: 0;
+        }
+        .table-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border: 1.5px solid #d5cdc3;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+        }
+        .catalog-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            line-height: 1.6;
+            min-width: 640px;
+            table-layout: auto;
+        }
+        .catalog-table thead th {
+            background: #faf6f0;
+            color: #3d2e1f;
+            font-weight: 700;
+            padding: 13px 10px;
+            text-align: center;
+            letter-spacing: 1.5px;
+            font-size: 14.5px;
+            border-bottom: 2.5px solid #c5b8a5;
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        .catalog-table thead th.col-seq {
+            width: 55px;
+            min-width: 50px;
+        }
+        .catalog-table thead th.col-content {
+            text-align: left;
+            padding-left: 16px;
+        }
+        .catalog-table thead th.col-status {
+            width: 150px;
+            min-width: 140px;
+            text-align: center;
+        }
+        .catalog-table tbody tr {
+            transition: background var(--transition);
+            border-bottom: 1px solid #eae3d9;
+        }
+        .catalog-table tbody tr:nth-child(odd) {
+            background: #fefdfa;
+        }
+        .catalog-table tbody tr:nth-child(even) {
+            background: #ffffff;
+        }
+        .catalog-table tbody tr:hover {
+            background: #fdf5ec;
+            outline: 1px solid #e8cfb0;
+            outline-offset: -1px;
+            position: relative;
+            z-index: 0;
+        }
+        .catalog-table tbody td {
+            padding: 10px 8px;
+            vertical-align: middle;
+            text-align: center;
+        }
+        .catalog-table .td-seq {
+            font-weight: 600;
+            color: #5a3e28;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            user-select: none;
+        }
+        .catalog-table .td-content {
+            text-align: left;
+            padding-left: 16px;
+            font-size: 14px;
+            color: var(--text-dark);
+            letter-spacing: 0.3px;
+            line-height: 1.7;
+        }
+        .material-name {
+            font-weight: 500;
+            color: #2a2018;
+        }
+        .material-note {
+            display: block;
+            font-size: 12px;
+            color: #8a7b6b;
+            margin-top: 2px;
+            letter-spacing: 0;
+            font-weight: 400;
+            line-height: 1.5;
+        }
+        .badge-conditional {
+            display: inline-block;
+            font-size: 11px;
+            padding: 2px 7px;
+            border-radius: 10px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            margin-left: 4px;
+            vertical-align: middle;
+            background: #fef5e7;
+            color: #b87830;
+            border: 1px solid #e8cfb0;
+            white-space: nowrap;
+        }
+        .badge-required {
+            background: #fef0f0;
+            color: #a04040;
+            border: 1px solid #e8c0c0;
+        }
+        .td-status {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            padding: 6px 4px;
+        }
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 6px 12px;
+            font-size: 12.5px;
+            font-weight: 500;
+            letter-spacing: 0.8px;
+            border-radius: 16px;
+            border: 1.5px solid transparent;
+            background: #fff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            font-family: inherit;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            color: #3d2e1f;
+            border-color: #d5cdc3;
+        }
+        .btn-action:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+        }
+        .btn-action:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+        .btn-edit {
+            background: #fdf6ef;
+            border-color: #d6b896;
+            color: #8b5a2b;
+        }
+        .btn-edit:hover {
+            background: #f9ecdb;
+            border-color: #c09060;
+        }
+        .btn-print-item {
+            background: #faf4f0;
+            border-color: #c5a090;
+            color: #6b4f3f;
+        }
+        .btn-print-item:hover {
+            background: #f3e6dd;
+            border-color: #b08070;
+        }
+        .btn-action span {
+            font-size: 15px;
+            line-height: 1;
+        }
+        .footer-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px 32px;
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1.5px dashed #d8d0c5;
+            font-size: 13.5px;
+            color: #5a4d3e;
+            justify-content: flex-end;
+            align-items: center;
+        }
+        .footer-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .footer-label {
+            font-weight: 600;
+            letter-spacing: 1px;
+            white-space: nowrap;
+            color: #4a3f35;
+        }
+        .footer-input {
+            border: none;
+            border-bottom: 1.5px dashed #c5bdb2;
+            background: transparent;
+            padding: 4px 8px;
+            font-size: 14px;
+            width: 110px;
+            font-family: inherit;
+            letter-spacing: 0.5px;
+            text-align: center;
+            transition: border-color var(--transition);
+        }
+        .footer-input:focus {
+            outline: none;
+            border-bottom-color: var(--accent-line);
+            border-bottom-style: solid;
+        }
+        .footer-input::placeholder {
+            color: #c5bfb5;
+        }
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-120px);
+            background: #3d2e1f;
+            color: #fff;
+            padding: 10px 24px;
+            border-radius: 20px;
+            font-size: 14px;
+            letter-spacing: 1px;
+            z-index: 1000;
+            pointer-events: none;
+            transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+        }
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+        /* 弹窗通用 */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(30, 20, 14, 0.55);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.25s ease;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        .modal-dialog {
+            background: #fffefc;
+            border-radius: 8px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.06);
+            width: 100%;
+            max-width: 720px;
+            max-height: 85vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+            position: relative;
+        }
+        .modal-header {
+            padding: 16px 20px;
+            border-bottom: 1.5px solid #e8e0d6;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            background: #fffefc;
+            z-index: 10;
+            border-radius: 8px 8px 0 0;
+        }
+        .modal-title {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: #3d2e1f;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .modal-close {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 1.5px solid #d5cdc3;
+            background: #fff;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition);
+            color: #8a7b6b;
+            line-height: 1;
+        }
+        .modal-close:hover {
+            background: #fdf5ec;
+            border-color: #b5a998;
+            color: #3d2e1f;
+        }
+        .modal-body {
+            padding: 20px;
+        }
+        .modal-footer {
+            padding: 14px 20px;
+            border-top: 1.5px solid #e8e0d6;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            position: sticky;
+            bottom: 0;
+            background: #fffefc;
+            z-index: 5;
+            border-radius: 0 0 8px 8px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-label-modal {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #4a3f35;
+            letter-spacing: 1.2px;
+            margin-bottom: 6px;
+        }
+        .form-input-modal {
+            width: 100%;
+            padding: 10px 14px;
+            font-size: 14px;
+            font-family: inherit;
+            letter-spacing: 0.6px;
+            border: 1.8px solid #d5cdc3;
+            border-radius: 4px;
+            background: #fffefc;
+            color: var(--text-dark);
+            transition: all var(--transition);
+            outline: none;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+        .form-input-modal:focus {
+            border-color: var(--accent-line);
+            box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.06);
+        }
+        .form-select-modal {
+            appearance: auto;
+            -webkit-appearance: auto;
+        }
+        .btn-cancel {
+            padding: 8px 18px;
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            border: 1.5px solid #d5cdc3;
+            background: #fff;
+            color: #5a4d3e;
+            transition: all var(--transition);
+        }
+        .btn-cancel:hover {
+            background: #fdf9f4;
+            border-color: #b5a998;
+        }
+        .btn-save {
+            padding: 8px 18px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            border: none;
+            color: #fff;
+            background: var(--primary);
+            transition: all var(--transition);
+            box-shadow: 0 2px 8px rgba(139, 26, 26, 0.2);
+        }
+        .btn-save:hover {
+            background: #9B2020;
+            box-shadow: 0 4px 14px rgba(139, 26, 26, 0.3);
+        }
+
+        /* ========== Quill 富文本编辑器样式覆盖 ========== */
+        .quill-wrapper {
+            border: 1.8px solid #d5cdc3;
+            border-radius: 4px;
+            background: #fffefc;
+            overflow: hidden;
+            transition: all var(--transition);
+        }
+        .quill-wrapper:focus-within {
+            border-color: var(--accent-line);
+            box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.06);
+        }
+        .quill-wrapper .ql-toolbar.ql-snow {
+            border: none;
+            border-bottom: 1px solid #e8e0d6;
+            background: #faf7f2;
+            padding: 5px 8px;
+            border-radius: 4px 4px 0 0;
+        }
+        .quill-wrapper .ql-container.ql-snow {
+            border: none;
+            font-family: inherit;
+            font-size: 14px;
+            border-radius: 0 0 4px 4px;
+        }
+        .quill-wrapper .ql-editor {
+            min-height: 100px;
+            max-height: 280px;
+            overflow-y: auto;
+            line-height: 1.7;
+            padding: 10px 14px;
+            font-family: inherit;
+            font-size: 14px;
+            color: var(--text-dark);
+        }
+        .quill-wrapper .ql-editor.ql-blank::before {
+            color: #c5bfb5;
+            font-style: normal;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+        }
+        .quill-wrapper .ql-snow .ql-stroke {
+            stroke: #5a4d3e;
+        }
+        .quill-wrapper .ql-snow .ql-fill {
+            fill: #5a4d3e;
+        }
+        .quill-wrapper .ql-snow.ql-toolbar button:hover,
+        .quill-wrapper .ql-snow .ql-toolbar button:hover {
+            color: var(--accent-line);
+        }
+        .quill-wrapper .ql-snow.ql-toolbar button:hover .ql-stroke,
+        .quill-wrapper .ql-snow .ql-toolbar button:hover .ql-stroke {
+            stroke: var(--accent-line);
+        }
+        .quill-wrapper .ql-snow.ql-toolbar button.ql-active,
+        .quill-wrapper .ql-snow .ql-toolbar button.ql-active {
+            color: var(--primary);
+        }
+        .quill-wrapper .ql-snow.ql-toolbar button.ql-active .ql-stroke,
+        .quill-wrapper .ql-snow .ql-toolbar button.ql-active .ql-stroke {
+            stroke: var(--primary);
+        }
+        /* 短字段编辑器高度较小 */
+        .quill-wrapper.short-editor .ql-editor {
+            min-height: 60px;
+            max-height: 150px;
+        }
+        /* 长字段编辑器高度较大 */
+        .quill-wrapper.long-editor .ql-editor {
+            min-height: 150px;
+            max-height: 350px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 700px) {
+            .content-wrapper {
+                padding: 16px 10px 14px;
+            }
+            .main-title {
+                font-size: 20px;
+                letter-spacing: 2px;
+            }
+            .info-section {
+                grid-template-columns: 1fr;
+                gap: 8px;
+                padding: 12px 14px;
+            }
+            .info-section::after {
+                display: none;
+            }
+            .catalog-table {
+                font-size: 12.5px;
+                min-width: 500px;
+            }
+            .catalog-table thead th {
+                font-size: 12px;
+                padding: 8px 4px;
+            }
+            .catalog-table .td-content {
+                padding-left: 8px;
+                font-size: 12.5px;
+            }
+            .material-note {
+                font-size: 10.5px;
+            }
+            .btn-action {
+                padding: 5px 10px;
+                font-size: 11px;
+                gap: 3px;
+            }
+            .btn-action span {
+                font-size: 13px;
+            }
+            .catalog-table thead th.col-status {
+                width: 120px;
+                min-width: 110px;
+            }
+            .footer-section {
+                gap: 8px 16px;
+                font-size: 12px;
+            }
+            .footer-input {
+                width: 80px;
+                font-size: 12px;
+            }
+            .modal-dialog {
+                max-width: 95vw;
+                margin: 10px;
+            }
+            .quill-wrapper .ql-editor {
+                min-height: 80px;
+                max-height: 200px;
+                font-size: 13px;
+            }
+        }
+        @media print {
+            body {
+                background: #fff;
+                padding: 0;
+                margin: 0;
+            }
+            .main-container {
+                box-shadow: none;
+                border-radius: 0;
+                max-width: 100%;
+                background: #fff;
+            }
+            .main-container::before {
+                height: 2px;
+                background: #000;
+                border-radius: 0;
+            }
+            .content-wrapper {
+                padding: 15px 20px 10px;
+            }
+            .main-title {
+                font-size: 22px;
+                letter-spacing: 2px;
+                color: #000;
+            }
+            .main-title-divider {
+                background: #000;
+                height: 1.5px;
+            }
+            .info-section {
+                border: 1.5px solid #999;
+                background: #fff;
+                padding: 12px 16px;
+            }
+            .info-value {
+                border-bottom: 1px dashed #999;
+                font-size: 13px;
+            }
+            .table-container {
+                border: 1.5px solid #666;
+                box-shadow: none;
+                border-radius: 0;
+            }
+            .catalog-table {
+                font-size: 12.5px;
+                min-width: auto;
+            }
+            .catalog-table thead th {
+                background: #f5f0e8;
+                color: #000;
+                font-size: 13px;
+                border-bottom: 2px solid #666;
+                padding: 8px 6px;
+            }
+            .catalog-table tbody td {
+                padding: 7px 6px;
+            }
+            .catalog-table tbody tr {
+                border-bottom: 0.5px solid #ccc;
+            }
+            .catalog-table tbody tr:nth-child(odd) {
+                background: #fefefe;
+            }
+            .catalog-table tbody tr:nth-child(even) {
+                background: #fff;
+            }
+            .catalog-table tbody tr:hover {
+                background: inherit;
+                outline: none;
+            }
+            .btn-action,
+            .modal-overlay {
+                display: none !important;
+            }
+            .td-status {
+                color: #999;
+                font-size: 12px;
+            }
+            .badge-conditional,
+            .badge-required {
+                border: 1px solid #999;
+                background: #f9f9f9;
+                color: #555;
+                font-size: 10px;
+            }
+            .footer-section {
+                border-top: 1.5px dashed #999;
+                font-size: 12px;
+            }
+            .footer-input {
+                border-bottom: 1px dashed #999;
+                font-size: 13px;
+            }
+            @page {
+                size: A4;
+                margin: 12mm 14mm 15mm 14mm;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <div class="content-wrapper">
+            <div class="header-section">
+                <a href="/" style="position:absolute;left:0;top:50%;transform:translateY(-50%);color:#8a7b6b;text-decoration:none;font-size:16px;padding:4px 8px;transition:color 0.2s;" onmouseover="this.style.color='#3d2e1f'" onmouseout="this.style.color='#8a7b6b'">← 返回</a>
+                <h1 class="main-title">安 全 卷 卷 内 材 料 目 录</h1>
+                <span class="main-title-divider"></span>
+                <p class="subtitle">（审查调查安全工作卷宗）</p>
+            </div>
+
+            <div class="info-section">
+                <div class="info-item info-item-full">
+                    <span class="info-label">案件名称：</span>
+                    <input type="text" class="info-value" placeholder="请输入案件名称" id="caseName">
+                </div>
+                <div class="info-item">
+                    <span class="info-label">被审查调查人：</span>
+                    <input type="text" class="info-value" placeholder="姓名" id="subjectName">
+                </div>
+                <div class="info-item">
+                    <span class="info-label">办案单位：</span>
+                    <input type="text" class="info-value" placeholder="单位名称" id="unitName">
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="catalog-table">
+                    <thead>
+                        <tr><th class="col-seq">序号</th><th class="col-content">卷内材料目录</th><th class="col-status">操作</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td class="td-seq">1</td><td class="td-content"><span class="material-name">安全首课记录</span><span class="material-note">（每个线索初核前 / 立案审查调查阶段写该部分内容）</span></td><td class="td-status"><button class="btn-action btn-edit" onclick="handleEdit('安全首课记录')">✏️ 编辑</button><button class="btn-action btn-print-item" onclick="handlePrint('安全首课记录')">🖨️ 打印</button><button class="btn-action btn-edit" style="background:#e8f0fe;border-color:#a0c4e8;color:#2b5a8a;" onclick="openOnlyOffice('安全首课记录')">📄 文档编辑</button></td></tr>
+                        <tr><td class="td-seq">2</td><td class="td-content"><span class="material-name">安全责任书</span><span class="material-note">（所有办案人员逐人逐份签字）</span></td><td class="td-status"><button class="btn-action btn-edit" onclick="handleEdit('安全责任书')">✏️ 编辑</button><button class="btn-action btn-print-item" onclick="handlePrint('安全责任书')">🖨️ 打印</button><button class="btn-action btn-edit" style="background:#e8f0fe;border-color:#a0c4e8;color:#2b5a8a;" onclick="openOnlyOffice('安全责任书')">📄 文档编辑</button></td></tr>
+                        <tr><td class="td-seq">3</td><td class="td-content"><span class="material-name">承诺书</span><span class="material-note">（初核和立案审查调查阶段都需要）</span></td><td class="td-status"><button class="btn-action btn-edit" onclick="handleEdit('承诺书')">✏️ 编辑</button><button class="btn-action btn-print-item" onclick="handlePrint('承诺书')">🖨️ 打印</button><button class="btn-action btn-edit" style="background:#e8f0fe;border-color:#a0c4e8;color:#2b5a8a;" onclick="openOnlyOffice('承诺书')">📄 文档编辑</button></td></tr>
+                        <tr><td class="td-seq">4</td><td class="td-content"><span class="material-name">谈话方案和安全预案呈阅件</span><span class="material-note">（经领导签字后的）</span></td><td class="td-status"><button class="btn-action btn-edit" onclick="handleEdit('谈话方案和安全预案呈阅件')">✏️ 编辑</button><button class="btn-action btn-print-item" onclick="handlePrint('谈话方案和安全预案呈阅件')">🖨️ 打印</button><button class="btn-action btn-edit" style="background:#e8f0fe;border-color:#a0c4e8;color:#2b5a8a;" onclick="openOnlyOffice('谈话方案和安全预案呈阅件')">📄 文档编辑</button></td></tr>
+                        <tr><td class="td-seq">5</td><td class="td-content"><span class="material-name">走读式谈话安全评估情况及安全预案</span><span class="material-note">（姓名，*月*日）</span></td><td class="td-status"><button class="btn-action btn-edit" onclick="handleEdit('走读式谈话安全评估情况及安全预案')">✏️ 编辑</button><button class="btn-action btn-print-item" onclick="handlePrint('走读式谈话安全评估情况及安全预案')">🖨️ 打印</button><button class="btn-action btn-edit" style="background:#e8f0fe;border-color:#a0c4e8;color:#2b5a8a;" onclick="openOnlyOffice('走读式谈话安全评估情况及安全预案')">📄 文档编辑</button></td></tr>
+                        <tr><td class="td-seq">6</td><td class="td-content"><span class="material-name">走读式谈话安全评估表</span><span class="material-note">（姓名，*月*日）</span></td><td class="td-status"><button class="btn-action btn-edit" onclick="handleEdit('走读式谈话安全评估表')">✏️ 编辑</button><button class="btn-action btn-print-item" onclick="handlePrint('走读式谈话安全评估表')">🖨️ 打印</button><button class="btn-action btn-edit" style="background:#e8f0fe;border-color:#a0c4e8;color:#2b5a8a;" onclick="openOnlyOffice('走读式谈话安全评估表')">📄 文档编辑</button></td></tr>
+                        <tr><td class="td-seq">7</td><td class="td-content"><span class="material-name">谈话方案</span><span class="material-note">（根据被审查调查人职级确定领导首谈）</span></td><td class="td-status"><button class="btn-action btn-edit" onclick="handleEdit('谈话方案')">✏️ 编辑</button><button class="btn-action btn-print-item" onclick="handlePrint('谈话方案')">🖨️ 打印</button><button class="btn-action btn-edit" style="background:#e8f0fe;border-color:#a0c4e8;color:#2b5a8a;" onclick="openOnlyOffice('谈话方案')">📄 文档编辑</button></td></tr>
+                        <tr><td class="td-seq">8</td><td class="td-content"><span class="material-name">采取谈话（询问、讯问）措施呈批表</span><span class="material-note">（用于新增加人员）</span></td><td class="td-status"><button class="btn-action btn-edit" onclick="handleEdit('采取谈话（询问、讯问）措施呈批表')">✏️ 编辑</button><button class="btn-action btn-print-item" onclick="handlePrint('采取谈话（询问、讯问）措施呈批表')">🖨️ 打印</button><button class="btn-action btn-edit" style="background:#e8f0fe;border-color:#a0c4e8;color:#2b5a8a;" onclick="openOnlyOffice('采取谈话（询问、讯问）措施呈批表')">📄 文档编辑</button></td></tr>
+                        <tr><td class="td-seq">9</td><td class="td-content"><span class="material-name">谈话对象人员名单</span></td><td class="td-status"><button class="btn-action btn-edit" onclick="handleEdit('谈话对象人员名单')">✏️ 编辑</button><button class="btn-action btn-print-item" onclick="handlePrint('谈话对象人员名单')">🖨️ 打印</button><button class="btn-action btn-edit" style="background:#e8f0fe;border-color:#a0c4e8;color:#2b5a8a;" onclick="openOnlyOffice('谈话对象人员名单')">📄 文档编辑</button></td></tr>
+                        <tr><td class="td-seq">10</td><td class="td-content"><span class="material-name">暂予保管物品登记表</span><span class="material-note">（姓名，*月*日）</span></td><td class="td-status"><button class="btn-action btn-edit" onclick="handleEdit('暂予保管物品登记表')">✏️ 编辑</button><button class="btn-action btn-print-item" onclick="handlePrint('暂予保管物品登记表')">🖨️ 打印</button><button class="btn-action btn-edit" style="background:#e8f0fe;border-color:#a0c4e8;color:#2b5a8a;" onclick="openOnlyOffice('暂予保管物品登记表')">📄 文档编辑</button></td></tr>
+                        <tr><td class="td-seq">11</td><td class="td-content"><span class="material-name">谈话对象体检情况登记表</span><span class="material-note">（姓名，*月*日）</span></td><td class="td-status"><button class="btn-action btn-edit" onclick="handleEdit('谈话对象体检情况登记表')">✏️ 编辑</button><button class="btn-action btn-print-item" onclick="handlePrint('谈话对象体检情况登记表')">🖨️ 打印</button><button class="btn-action btn-edit" style="background:#e8f0fe;border-color:#a0c4e8;color:#2b5a8a;" onclick="openOnlyOffice('谈话对象体检情况登记表')">📄 文档编辑</button></td></tr>
+                        <tr><td class="td-seq">12</td><td class="td-content"><span class="material-name">陪送交接单</span><span class="material-note">（姓名，*月*日）</span></td><td class="td-status"><button class="btn-action btn-edit" onclick="handleEdit('陪送交接单')">✏️ 编辑</button><button class="btn-action btn-print-item" onclick="handlePrint('陪送交接单')">🖨️ 打印</button><button class="btn-action btn-edit" style="background:#e8f0fe;border-color:#a0c4e8;color:#2b5a8a;" onclick="openOnlyOffice('陪送交接单')">📄 文档编辑</button></td></tr>
+                        <tr><td class="td-seq">13</td><td class="td-content"><span class="material-name">谈话（讯问、询问）工作记录</span><span class="material-note">（姓名，*月*日）</span></td><td class="td-status"><button class="btn-action btn-edit" onclick="handleEdit('谈话（讯问、询问）工作记录')">✏️ 编辑</button><button class="btn-action btn-print-item" onclick="handlePrint('谈话（讯问、询问）工作记录')">🖨️ 打印</button><button class="btn-action btn-edit" style="background:#e8f0fe;border-color:#a0c4e8;color:#2b5a8a;" onclick="openOnlyOffice('谈话（讯问、询问）工作记录')">📄 文档编辑</button></td></tr>
+                        <tr><td class="td-seq">14</td><td class="td-content"><span class="material-name">有关工作情况说明</span><span class="badge-conditional">条件性</span><span class="material-note">（出现非正常情况时作此说明）</span></td><td class="td-status"><button class="btn-action btn-edit" onclick="handleEdit('有关工作情况说明')">✏️ 编辑</button><button class="btn-action btn-print-item" onclick="handlePrint('有关工作情况说明')">🖨️ 打印</button><button class="btn-action btn-edit" style="background:#e8f0fe;border-color:#a0c4e8;color:#2b5a8a;" onclick="openOnlyOffice('有关工作情况说明')">📄 文档编辑</button></td></tr>
+                        <tr><td class="td-seq">15</td><td class="td-content"><span class="material-name">审查调查安全责任明细表</span></td><td class="td-status"><button class="btn-action btn-edit" onclick="handleEdit('审查调查安全责任明细表')">✏️ 编辑</button><button class="btn-action btn-print-item" onclick="handlePrint('审查调查安全责任明细表')">🖨️ 打印</button><button class="btn-action btn-edit" style="background:#e8f0fe;border-color:#a0c4e8;color:#2b5a8a;" onclick="openOnlyOffice('审查调查安全责任明细表')">📄 文档编辑</button></td></tr>
+                        <tr><td class="td-seq">16</td><td class="td-content"><span class="material-name">专章总结记录</span><span class="badge-conditional">结案后</span><span class="material-note">（只在案件结案后写该部分内容）</span></td><td class="td-status"><button class="btn-action btn-edit" onclick="handleEdit('专章总结记录')">✏️ 编辑</button><button class="btn-action btn-print-item" onclick="handlePrint('专章总结记录')">🖨️ 打印</button><button class="btn-action btn-edit" style="background:#e8f0fe;border-color:#a0c4e8;color:#2b5a8a;" onclick="openOnlyOffice('专章总结记录')">📄 文档编辑</button></td></tr>
+                        <tr><td class="td-seq">17</td><td class="td-content"><span class="material-name">谈话录音录像交接表</span></td><td class="td-status"><button class="btn-action btn-edit" onclick="handleEdit('谈话录音录像交接表')">✏️ 编辑</button><button class="btn-action btn-print-item" onclick="handlePrint('谈话录音录像交接表')">🖨️ 打印</button><button class="btn-action btn-edit" style="background:#e8f0fe;border-color:#a0c4e8;color:#2b5a8a;" onclick="openOnlyOffice('谈话录音录像交接表')">📄 文档编辑</button></td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="footer-section">
+                <div class="footer-item"><span class="footer-label">立卷人：</span><input type="text" class="footer-input" placeholder="签名" id="archivist"></div>
+                <div class="footer-item"><span class="footer-label">检查人：</span><input type="text" class="footer-input" placeholder="签名" id="reviewer"></div>
+                <div class="footer-item"><span class="footer-label">立卷日期：</span><input type="date" class="footer-input" id="archiveDate" style="width:130px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <!-- 编辑弹窗 -->
+    <div class="modal-overlay" id="editModal" style="display:none;" onclick="if(event.target===this)closeEditModal()">
+        <div class="modal-dialog" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <span class="modal-title" id="editModalTitle">✏️ 材料录入</span>
+                <button class="modal-close" onclick="closeEditModal()">✕</button>
+            </div>
+            <div class="modal-body" id="editModalBody"></div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeEditModal()">取 消</button>
+                <button class="btn-save" onclick="saveMaterial()">💾 保存内容</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quill JS -->
+    <script src="/static/quill/quill.min.js"></script>
+    <script>
+        // ==================== 全局变量 ====================
+        let currentEditMaterial = '';
+        let quillInstances = []; // 存储当前弹窗中所有 Quill 实例
+
+        // ==================== 材料字段配置 ====================
+        const materialForms = {
+            '安全首课记录': {
+                fields: [
+                    { label: '标题', type: 'text', placeholder: '请输入标题', required: true },
+                    { label: '时间', type: 'date', required: true },
+                    { label: '地点', type: 'text', placeholder: '例如：***室' },
+                    { label: '主持人', type: 'text', placeholder: '主持人姓名', required: true },
+                    { label: '参加人员', type: 'text', placeholder: '请列举参加人员（可使用列表）', rows: 3 },
+                    { label: '议题', type: 'text', placeholder: '会议议题内容', rows: 4 },
+                    { label: '学习内容', type: 'textarea', placeholder: '安全首课学习具体内容', rows: 6 }
+                ]
+            },
+            '安全责任书': {
+                fields: [
+                    { label: '签订日期', type: 'date', required: true },
+                    { label: '办案人员签名', type: 'textarea', placeholder: '所有办案人员逐人签名（每行一个）', rows: 4 },
+                    { label: '责任要求', type: 'textarea', placeholder: '安全责任具体要求', rows: 6 }
+                ]
+            },
+            '承诺书': {
+                fields: [
+                    { label: '承诺人', type: 'text', placeholder: '承诺人姓名', required: true },
+                    { label: '承诺日期', type: 'date', required: true },
+                    { label: '承诺内容', type: 'textarea', placeholder: '承诺遵守的安全纪律等内容', rows: 6 }
+                ]
+            },
+            '谈话方案和安全预案呈阅件': {
+                fields: [
+                    { label: '呈报日期', type: 'date', required: true },
+                    { label: '领导签字', type: 'text', placeholder: '领导签字' },
+                    { label: '方案摘要', type: 'textarea', placeholder: '谈话方案及安全预案摘要', rows: 6 }
+                ]
+            },
+            '走读式谈话安全评估情况及安全预案': {
+                fields: [
+                    { label: '被谈话人姓名', type: 'text', placeholder: '姓名', required: true },
+                    { label: '评估日期', type: 'date', required: true },
+                    { label: '风险评估等级', type: 'select', options: ['低风险', '中风险', '高风险'] },
+                    { label: '安全预案措施', type: 'textarea', placeholder: '详细安全预案措施', rows: 6 }
+                ]
+            },
+            '走读式谈话安全评估表': {
+                fields: [
+                    { label: '被谈话人', type: 'text', required: true },
+                    { label: '评估日期', type: 'date', required: true },
+                    { label: '身体状况评估', type: 'select', options: ['良好', '一般', '较差'] },
+                    { label: '心理状态评估', type: 'select', options: ['稳定', '焦虑', '不稳定'] },
+                    { label: '综合风险等级', type: 'select', options: ['低', '中', '高'] },
+                    { label: '评估人员签名', type: 'text', placeholder: '签名' }
+                ]
+            },
+            '谈话方案': {
+                fields: [
+                    { label: '制定日期', type: 'date', required: true },
+                    { label: '主谈人', type: 'text', placeholder: '领导首谈人员' },
+                    { label: '谈话地点', type: 'text', placeholder: '谈话室编号' },
+                    { label: '谈话提纲', type: 'textarea', placeholder: '详细谈话提纲', rows: 8 }
+                ]
+            },
+            '采取谈话（询问、讯问）措施呈批表': {
+                fields: [
+                    { label: '呈批日期', type: 'date', required: true },
+                    { label: '对象姓名', type: 'text', required: true },
+                    { label: '措施类型', type: 'select', options: ['谈话', '询问', '讯问'] },
+                    { label: '审批意见', type: 'textarea', placeholder: '审批意见', rows: 4 }
+                ]
+            },
+            '谈话对象人员名单': {
+                fields: [
+                    { label: '名单日期', type: 'date', required: true },
+                    { label: '人员列表', type: 'textarea', placeholder: '姓名、单位、职务（可使用编号列表）', rows: 6 }
+                ]
+            },
+            '暂予保管物品登记表': {
+                fields: [
+                    { label: '物品持有人', type: 'text', required: true },
+                    { label: '登记日期', type: 'date', required: true },
+                    { label: '物品清单', type: 'textarea', placeholder: '物品名称、数量、特征', rows: 5 },
+                    { label: '保管人', type: 'text', placeholder: '保管人签名' }
+                ]
+            },
+            '谈话对象体检情况登记表': {
+                fields: [
+                    { label: '体检人姓名', type: 'text', required: true },
+                    { label: '体检日期', type: 'date', required: true },
+                    { label: '血压', type: 'text', placeholder: '例如 120/80' },
+                    { label: '心率', type: 'text', placeholder: '次/分' },
+                    { label: '其他异常', type: 'textarea', placeholder: '无则填"无"', rows: 2 },
+                    { label: '医生签名', type: 'text' }
+                ]
+            },
+            '陪送交接单': {
+                fields: [
+                    { label: '被陪送人', type: 'text', required: true },
+                    { label: '陪送日期', type: 'date', required: true },
+                    { label: '陪送人', type: 'text', placeholder: '陪送人员签名' },
+                    { label: '接收人', type: 'text', placeholder: '接收单位人员签名' },
+                    { label: '备注', type: 'textarea', placeholder: '备注信息', rows: 3 }
+                ]
+            },
+            '谈话（讯问、询问）工作记录': {
+                fields: [
+                    { label: '谈话日期', type: 'date', required: true },
+                    { label: '谈话对象', type: 'text', required: true },
+                    { label: '谈话人', type: 'text', placeholder: '谈话人员签名' },
+                    { label: '记录人', type: 'text', placeholder: '记录人签名' },
+                    { label: '谈话内容摘要', type: 'textarea', placeholder: '工作记录摘要', rows: 8 }
+                ]
+            },
+            '有关工作情况说明': {
+                fields: [
+                    { label: '说明日期', type: 'date', required: true },
+                    { label: '异常情况描述', type: 'textarea', placeholder: '描述出现的非正常情况', rows: 5 },
+                    { label: '处理措施', type: 'textarea', placeholder: '采取的处理措施', rows: 4 },
+                    { label: '说明人', type: 'text', placeholder: '说明人签名' }
+                ]
+            },
+            '审查调查安全责任明细表': {
+                fields: [
+                    { label: '填表日期', type: 'date', required: true },
+                    { label: '责任人', type: 'text', placeholder: '主要责任人' },
+                    { label: '安全职责', type: 'textarea', placeholder: '具体安全责任内容', rows: 6 },
+                    { label: '监督人', type: 'text', placeholder: '监督人签名' }
+                ]
+            },
+            '专章总结记录': {
+                fields: [
+                    { label: '结案日期', type: 'date', required: true },
+                    { label: '总结人', type: 'text', required: true },
+                    { label: '安全工作总结', type: 'textarea', placeholder: '审查调查安全工作专章总结', rows: 10 }
+                ]
+            },
+            '谈话录音录像交接表': {
+                fields: [
+                    { label: '交接日期', type: 'date', required: true },
+                    { label: '录音录像编号', type: 'text', required: true },
+                    { label: '移交人', type: 'text', placeholder: '移交人签名' },
+                    { label: '接收人', type: 'text', placeholder: '接收人签名' },
+                    { label: '备注', type: 'textarea', placeholder: '备注信息', rows: 3 }
+                ]
+            }
+        };
+
+        // ==================== Toast 提示 ====================
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            clearTimeout(t._timeout);
+            t._timeout = setTimeout(() => t.classList.remove('show'), 2200);
+        }
+
+        // ==================== 打印 ====================
+        function handlePrint(name) {
+            showToast(`🖨️ 正在准备打印：${name}`);
+        }
+
+        // ==================== 销毁所有 Quill 实例 ====================
+        function destroyQuillInstances() {
+            quillInstances.forEach(item => {
+                try {
+                    // Quill 1.x 没有显式的 destroy 方法，移除 DOM 并置空引用
+                    const container = document.getElementById(item.id);
+                    if (container) {
+                        container.innerHTML = '';
+                    }
+                } catch (e) {
+                    // 忽略错误
+                }
+            });
+            quillInstances = [];
+        }
+
+        // ==================== 打开编辑弹窗 ====================
+        function handleEdit(materialName) {
+            const config = materialForms[materialName];
+            if (!config) {
+                showToast('未找到该材料配置');
+                return;
+            }
+
+            // 先清理旧实例
+            destroyQuillInstances();
+            currentEditMaterial = materialName;
+            document.getElementById('editModalTitle').innerHTML = `✏️ 编辑 - ${materialName}`;
+
+            // 渲染表单 HTML
+            let html = '';
+            config.fields.forEach((field, idx) => {
+                const fieldId = `field_${idx}`;
+                html += `<div class="form-group">`;
+                html +=
+                    `<label class="form-label-modal">${field.label} ${field.required ? '<span style="color:#c0392b;">*</span>' : ''}</label>`;
+
+                if (field.type === 'textarea') {
+                    // Quill 富文本编辑器容器
+                    const heightClass = (field.rows && field.rows >= 8) ? 'long-editor' : (
+                        (field.rows && field.rows <= 3) ? 'short-editor' : '');
+                    html += `<div class="quill-wrapper ${heightClass}">`;
+                    html += `<div id="${fieldId}" class="quill-editor-container"></div>`;
+                    html += `</div>`;
+                } else if (field.type === 'select') {
+                    html +=
+                        `<select class="form-input-modal form-select-modal" id="${fieldId}" data-field-type="select">`;
+                    (field.options || []).forEach(opt => {
+                        html += `<option value="${opt}">${opt}</option>`;
+                    });
+                    html += `</select>`;
+                } else if (field.type === 'date') {
+                    html +=
+                        `<input type="date" class="form-input-modal" id="${fieldId}" data-field-type="date" required>`;
+                } else {
+                    html +=
+                        `<input type="text" class="form-input-modal" id="${fieldId}" data-field-type="text" placeholder="${field.placeholder || ''}">`;
+                }
+                html += `</div>`;
+            });
+
+            document.getElementById('editModalBody').innerHTML = html;
+            document.getElementById('editModal').style.display = 'flex';
+
+            // 初始化 Quill 实例
+            config.fields.forEach((field, idx) => {
+                if (field.type === 'textarea') {
+                    const fieldId = `field_${idx}`;
+                    const container = document.getElementById(fieldId);
+                    if (container) {
+                        const quill = new Quill('#' + fieldId, {
+                            theme: 'snow',
+                            placeholder: field.placeholder || '请输入内容...',
+                            modules: {
+                                toolbar: [
+                                    ['bold', 'italic', 'underline'],
+                                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                    ['clean']
+                                ]
+                            }
+                        });
+                        quillInstances.push({ id: fieldId, quill: quill });
+                    }
+                }
+            });
+
+            // 自动聚焦第一个字段
+            setTimeout(() => {
+                const firstField = config.fields[0];
+                if (firstField.type === 'textarea' && quillInstances.length > 0) {
+                    quillInstances[0].quill.focus();
+                } else {
+                    const firstInput = document.getElementById('field_0');
+                    if (firstInput) firstInput.focus();
+                }
+            }, 150);
+        }
+
+        // ==================== 关闭弹窗 ====================
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+            destroyQuillInstances();
+            currentEditMaterial = '';
+        }
+
+        // ==================== 保存材料 ====================
+        function saveMaterial() {
+            const config = materialForms[currentEditMaterial];
+            if (!config) return;
+
+            const data = {};
+            let valid = true;
+
+            config.fields.forEach((field, idx) => {
+                const fieldId = `field_${idx}`;
+                let val;
+
+                if (field.type === 'textarea') {
+                    // 从 Quill 实例获取 HTML 内容
+                    const qi = quillInstances.find(q => q.id === fieldId);
+                    if (qi && qi.quill) {
+                        val = qi.quill.root.innerHTML.trim();
+                        // 也获取纯文本用于校验
+                        const textVal = qi.quill.getText().trim();
+                        if (field.required && !textVal) {
+                            showToast(`请填写「${field.label}」`);
+                            qi.quill.focus();
+                            valid = false;
+                            return;
+                        }
+                    } else {
+                        val = '';
+                    }
+                } else {
+                    const el = document.getElementById(fieldId);
+                    if (el) {
+                        val = el.value.trim();
+                    } else {
+                        val = '';
+                    }
+                    if (field.required && !val) {
+                        showToast(`请填写「${field.label}」`);
+                        if (el) el.focus();
+                        valid = false;
+                        return;
+                    }
+                }
+
+                data[field.label] = val;
+            });
+
+            if (!valid) return;
+
+            // 输出保存数据（实际项目中发送到后端）
+            console.log(`📝 保存材料 [${currentEditMaterial}]：`, data);
+            console.log(`   HTML内容字段：`, config.fields
+                .filter(f => f.type === 'textarea')
+                .map(f => f.label)
+                .join('、'));
+
+            showToast(`✅ 「${currentEditMaterial}」内容已保存`);
+            closeEditModal();
+        }
+
+        // ==================== 键盘事件 ====================
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('editModal');
+                if (modal.style.display === 'flex') {
+                    closeEditModal();
+                }
+            }
+        });
+
+        // ==================== 打开 OnlyOffice 离线编辑器 ====================
+        function openOnlyOffice(materialName) {
+            // 获取当前 URL 中的 id 参数（从首页传过来的案件 ID）
+            const urlParams = new URLSearchParams(window.location.search);
+            const caseId = urlParams.get('id') || 'new';
+            const encodedName = encodeURIComponent(materialName);
+            window.open(`/editor/material?name=${encodedName}&id=${caseId}`, '_blank');
+        }
+
+        console.log('✅ 安全卷目录（Quill富文本编辑器版）已就绪');
+        console.log('   📋 共 17 项材料，每项配有独立录入表单');
+        console.log('   ✏️ 长文本字段均使用 Quill 富文本编辑器');
+        console.log('   🛠️ 工具栏：加粗 | 斜体 | 下划线 | 有序列表 | 无序列表 | 清除格式');
+    </script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+static/packages/
+uploads/
+__pycache__/
+*.pyc
+.env

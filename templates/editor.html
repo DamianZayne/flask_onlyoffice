@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ doc_name }} — 编辑器</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      display: flex; flex-direction: column; height: 100vh; overflow: hidden;
+    }
+    .toolbar {
+      display: flex; align-items: center; gap: 12px;
+      padding: 8px 16px; background: #fff;
+      border-bottom: 1px solid #e0e0e0; flex-shrink: 0;
+    }
+    .toolbar .back { color: #666; text-decoration: none; font-size: 18px; padding: 4px 8px; }
+    .toolbar .back:hover { color: #333; }
+    .toolbar .doc-title { font-weight: 600; font-size: 14px; flex: 1; }
+    .badge { font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #e8f0fe; color: #4a90d9; }
+    .btn { padding: 4px 12px; border-radius: 4px; border: 1px solid #ccc; background: #fff; cursor: pointer; font-size: 12px; }
+    .btn:hover { background: #f5f5f5; }
+    .btn-primary { background: #4a90d9; color: #fff; border: none; }
+    .btn-primary:hover { background: #357abd; }
+
+    /* OnlyOffice 容器 */
+    .onlyoffice-container { position: relative; flex: 1; background: #e8e8e8; }
+    #iframe-office-id { position: absolute; inset: 0; }
+
+    .loading-mask {
+      position: absolute; inset: 0; z-index: 20;
+      background: rgba(255,255,255,0.95);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      pointer-events: none;
+    }
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid #e0e0e0; border-top-color: #4a90d9;
+      border-radius: 50%; animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { margin-top: 12px; color: #999; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <a href="{{ back_url }}" class="back">← 返回</a>
+    <span class="doc-title">{{ doc_name }}</span>
+    <span class="badge">.{{ doc_ext }}</span>
+    <span style="flex:1"></span>
+    <button class="btn" onclick="toggleReadOnly()" id="btnReadOnly">只读</button>
+    <button class="btn btn-primary" onclick="saveDoc()" id="btnSave">💾 保存</button>
+    <button class="btn btn-primary" onclick="downloadDoc()">⬇ 下载</button>
+  </div>
+
+  <div class="onlyoffice-container" id="editorWrap">
+    <div class="loading-mask" id="loadingMask">
+      <div class="spinner"></div>
+      <p class="loading-text">正在加载编辑器…</p>
+    </div>
+    <div id="iframe-office-id"></div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- 1. OnlyOffice SDK（本地路径，无外网依赖）                           -->
+  <!-- ================================================================ -->
+  <script src="/packages/onlyoffice/9.3.0/web-apps/apps/api/documents/api.js"></script>
+
+  <!-- ================================================================ -->
+  <!-- 2. 组件库（esbuild 打包，包含 Mock Server / x2t / 代理）           -->
+  <!-- ================================================================ -->
+  <script src="/static/onlyoffice-web-comp.js"></script>
+
+  <script>
+    (async function() {
+      // ── 从组件库获取 API ──────────────────────────────────
+      const { OnlyOfficeManager, FILE_TYPE, ONLYOFFICE_ID } = OnlyOfficeWebComp;
+
+      // ── Flask 传入的文档信息 ───────────────────────────────
+      const DOC_ID   = "{{ doc_id }}";
+      const DOC_URL  = "{{ doc_url }}";
+      const DOC_NAME = "{{ doc_name }}";
+      const DOC_EXT  = "{{ doc_ext }}";
+      const SAVE_URL = "{{ save_url }}";
+
+      // 扩展名 → 组件库的 FILE_TYPE
+      const extToType = {
+        docx: FILE_TYPE.DOCX, doc: FILE_TYPE.DOCX, odt: FILE_TYPE.DOCX,
+        rtf: FILE_TYPE.DOCX, txt: FILE_TYPE.DOCX, docm: FILE_TYPE.DOCX,
+        xlsx: FILE_TYPE.XLSX, xls: FILE_TYPE.XLSX, ods: FILE_TYPE.XLSX,
+        csv: FILE_TYPE.XLSX, xlsm: FILE_TYPE.XLSX,
+        pptx: FILE_TYPE.PPTX, ppt: FILE_TYPE.PPTX, odp: FILE_TYPE.PPTX,
+        pptm: FILE_TYPE.PPTX,
+      };
+      const fileType = extToType[DOC_EXT.toLowerCase()] || FILE_TYPE.DOCX;
+
+      let manager = null;
+
+      try {
+        if (DOC_URL) {
+          // ── 从 Flask 下载已有文档 ────────────────────────────
+          const resp = await fetch(DOC_URL);
+          if (!resp.ok) throw new Error(`下载失败: HTTP ${resp.status}`);
+
+          const blob = await resp.blob();
+          const file = new File([blob], DOC_NAME, { type: blob.type });
+
+          manager = await OnlyOfficeManager.createWithFile(
+            { containerId: ONLYOFFICE_ID, fileType, defaultFileName: DOC_NAME, readOnly: false, lang: "zh" },
+            file,
+          );
+        } else {
+          // ── 新建空白文档 ─────────────────────────────────────
+          manager = await OnlyOfficeManager.create(
+            { containerId: ONLYOFFICE_ID, fileType, defaultFileName: DOC_NAME, readOnly: false, lang: "zh" },
+          );
+        }
+
+        // ── 隐藏加载遮罩 ──────────────────────────────────────
+        document.getElementById("loadingMask").style.display = "none";
+
+        // ── 监听 loading 状态 ─────────────────────────────────
+        manager.onLoadingChange(({ loading }) => {
+          document.getElementById("loadingMask").style.display =
+            loading ? "flex" : "none";
+        });
+
+        console.log("[Flask-Editor] 文档已加载:", DOC_NAME);
+      } catch (err) {
+        console.error("[Flask-Editor] 加载失败:", err);
+        document.querySelector(".loading-text").textContent =
+          "加载失败: " + err.message;
+      }
+
+      // ── 工具栏按钮 ──────────────────────────────────────────
+      window.toggleReadOnly = async function() {
+        if (!manager) return;
+        await manager.toggleReadOnly();
+        const btn = document.getElementById("btnReadOnly");
+        btn.textContent = manager.getReadOnly() ? "编辑" : "只读";
+      };
+
+      window.saveDoc = async function() {
+        if (!manager) return;
+        if (!SAVE_URL) { alert("无法保存：未配置保存地址"); return; }
+        const btn = document.getElementById("btnSave");
+        btn.textContent = "保存中…";
+        btn.disabled = true;
+        try {
+          const result = await manager.exportAsBlob();
+          const resp = await fetch(SAVE_URL, {
+            method: "POST",
+            body: result.blob,
+          });
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const data = await resp.json();
+          if (data.error !== 0) throw new Error(data.error);
+          btn.textContent = "✅ 已保存";
+          console.log("[Flask-Editor] 已保存到服务器:", DOC_NAME);
+        } catch (err) {
+          console.error("保存失败:", err);
+          alert("保存失败: " + err.message);
+          btn.textContent = "💾 保存";
+        } finally {
+          btn.disabled = false;
+          setTimeout(() => { btn.textContent = "💾 保存"; }, 2000);
+        }
+      };
+
+      window.downloadDoc = async function() {
+        if (!manager) return;
+        try {
+          await manager.downloadExport();
+        } catch (err) {
+          console.error("导出失败:", err);
+          alert("导出失败: " + err.message);
+        }
+      };
+    })();
+  </script>
+</body>
+</html>

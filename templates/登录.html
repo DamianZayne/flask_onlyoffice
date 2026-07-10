@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智慧办案助手 - 登录</title>
+    <style>
+        :root {
+            --primary: #8B1A1A;
+            --primary-dark: #6B0F0F;
+            --primary-light: #A52A2A;
+            --accent: #C0392B;
+            --gold: #B8860B;
+            --gold-light: #D4A843;
+            --bg-dark: #1a1410;
+            --bg-card: #fffefc;
+            --text-dark: #2a2018;
+            --text-secondary: #5a4d3e;
+            --text-muted: #8a7b6b;
+            --border-color: #d5cdc3;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.18);
+            --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.25);
+            --radius: 6px;
+            --radius-sm: 4px;
+            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", "STSong", "SimSun", "宋体", serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #f5f0e8;
+            background-image:
+                radial-gradient(ellipse at 30% 20%, rgba(139, 26, 26, 0.04) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 80%, rgba(139, 26, 26, 0.03) 0%, transparent 55%),
+                radial-gradient(ellipse at 50% 50%, rgba(184, 134, 11, 0.03) 0%, transparent 70%);
+            padding: 24px;
+            -webkit-font-smoothing: antialiased;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 背景装饰线条 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -180px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 800px;
+            border: 1.5px solid rgba(139, 26, 26, 0.06);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -240px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 900px;
+            height: 900px;
+            border: 1.5px solid rgba(139, 26, 26, 0.04);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* 主卡片 */
+        .login-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 420px;
+            background: #fffefc;
+            border-radius: 10px;
+            box-shadow: var(--shadow-lg), 0 0 0 1px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        /* 顶部装饰条 */
+        .login-container::before {
+            content: '';
+            display: block;
+            height: 5px;
+            background: linear-gradient(90deg,
+                    var(--primary-dark),
+                    var(--accent),
+                    #d4644a,
+                    var(--gold-light),
+                    var(--accent),
+                    var(--primary-dark));
+            border-radius: 10px 10px 0 0;
+        }
+
+        .login-inner {
+            padding: 44px 40px 40px;
+        }
+
+        /* 徽标区域 */
+        .logo-section {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .logo-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #fdf6f0 0%, #f8ede0 100%);
+            border: 2.5px solid #d4c5ad;
+            margin-bottom: 14px;
+            box-shadow: 0 4px 16px rgba(139, 26, 26, 0.10);
+            position: relative;
+        }
+
+        .logo-icon-inner {
+            font-size: 30px;
+            line-height: 1;
+            color: var(--primary);
+            font-weight: 700;
+            letter-spacing: 2px;
+            font-family: "STZhongsong", "SimSun", "PingFang SC", serif;
+        }
+
+        /* 标题 */
+        .app-title {
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 6px;
+            font-family: "STZhongsong", "SimSun", "PingFang SC", "Microsoft YaHei", serif;
+            line-height: 1.3;
+        }
+
+        .app-subtitle {
+            display: block;
+            font-size: 12.5px;
+            color: var(--text-muted);
+            letter-spacing: 3px;
+            text-align: center;
+            font-weight: 400;
+            margin-bottom: 32px;
+            text-transform: uppercase;
+        }
+
+        .title-divider {
+            display: block;
+            width: 50px;
+            height: 2.5px;
+            background: var(--accent);
+            margin: 0 auto 8px;
+            border-radius: 2px;
+        }
+
+        /* 表单区域 */
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #4a3f35;
+            letter-spacing: 1.5px;
+            margin-bottom: 8px;
+            padding-left: 2px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            font-size: 17px;
+            color: #b5a998;
+            pointer-events: none;
+            transition: color var(--transition);
+            line-height: 1;
+            z-index: 2;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 13px 16px 13px 44px;
+            font-size: 15px;
+            font-family: inherit;
+            letter-spacing: 0.8px;
+            color: var(--text-dark);
+            background: #fefdfb;
+            border: 1.8px solid #d8d0c5;
+            border-radius: var(--radius);
+            transition: all var(--transition);
+            outline: none;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+        }
+
+        .form-input::placeholder {
+            color: #c5bfb5;
+            letter-spacing: 0.5px;
+            font-size: 13.5px;
+        }
+
+        .form-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(192, 57, 43, 0.07), 0 2px 8px rgba(0, 0, 0, 0.04);
+            background: #fffef8;
+        }
+
+        .form-input:focus~.input-icon,
+        .input-wrapper:focus-within .input-icon {
+            color: var(--accent);
+        }
+
+        .form-input.error {
+            border-color: #c0392b;
+            box-shadow: 0 0 0 4px rgba(192, 57, 43, 0.08);
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+            20% {
+                transform: translateX(-6px);
+            }
+            40% {
+                transform: translateX(6px);
+            }
+            60% {
+                transform: translateX(-4px);
+            }
+            80% {
+                transform: translateX(3px);
+            }
+        }
+
+        /* 记住密码 & 选项行 */
+        .options-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .remember-me input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 17px;
+            height: 17px;
+            border: 1.8px solid #c5bdb2;
+            border-radius: 3px;
+            cursor: pointer;
+            position: relative;
+            background: #fffefc;
+            transition: all var(--transition);
+            flex-shrink: 0;
+        }
+
+        .remember-me input[type="checkbox"]:checked {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .remember-me input[type="checkbox"]:checked::after {
+            content: '';
+            position: absolute;
+            left: 4.5px;
+            top: 1.5px;
+            width: 5px;
+            height: 9px;
+            border: solid #fff;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .remember-me span {
+            letter-spacing: 0.5px;
+            font-size: 13px;
+        }
+
+        .forgot-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            font-size: 13px;
+            transition: color var(--transition);
+            cursor: pointer;
+        }
+
+        .forgot-link:hover {
+            color: var(--accent);
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        /* 登录按钮 */
+        .btn-login {
+            width: 100%;
+            padding: 14px 20px;
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            font-family: inherit;
+            color: #fff;
+            background: linear-gradient(135deg, var(--primary) 0%, #9B2020 50%, var(--primary-dark) 100%);
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all var(--transition);
+            box-shadow: 0 4px 14px rgba(139, 26, 26, 0.30);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-login::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .btn-login:hover {
+            background: linear-gradient(135deg, #9B2020 0%, #a52020 50%, #7a1515 100%);
+            box-shadow: 0 6px 22px rgba(139, 26, 26, 0.40);
+            transform: translateY(-2px);
+        }
+
+        .btn-login:hover::before {
+            left: 100%;
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+            box-shadow: 0 3px 10px rgba(139, 26, 26, 0.25);
+            background: var(--primary-dark);
+        }
+
+        .btn-login:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+            pointer-events: none;
+            filter: grayscale(15%);
+        }
+
+        /* 底部提示 */
+        .login-footer {
+            text-align: center;
+            margin-top: 22px;
+            font-size: 12px;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+        }
+
+        .login-footer span {
+            color: #b5a998;
+        }
+
+        /* Toast 提示 */
+        .toast {
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-130px);
+            padding: 12px 26px;
+            border-radius: 24px;
+            font-size: 14px;
+            letter-spacing: 1px;
+            z-index: 1000;
+            pointer-events: none;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.25);
+            font-family: inherit;
+            white-space: nowrap;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast-success {
+            background: #2d5016;
+            color: #e8f5d8;
+        }
+
+        .toast-error {
+            background: #7a1a1a;
+            color: #fde8e8;
+        }
+
+        .toast-info {
+            background: #3d2e1f;
+            color: #fdf6ef;
+        }
+
+        /* 响应式 */
+        @media (max-width: 480px) {
+            .login-inner {
+                padding: 32px 22px 28px;
+            }
+            .app-title {
+                font-size: 22px;
+                letter-spacing: 3px;
+            }
+            .app-subtitle {
+                font-size: 11px;
+                letter-spacing: 2px;
+                margin-bottom: 24px;
+            }
+            .logo-icon {
+                width: 54px;
+                height: 54px;
+                margin-bottom: 10px;
+            }
+            .logo-icon-inner {
+                font-size: 25px;
+            }
+            .form-input {
+                padding: 12px 14px 12px 40px;
+                font-size: 14px;
+            }
+            .btn-login {
+                padding: 13px 16px;
+                font-size: 15px;
+                letter-spacing: 2px;
+            }
+            .options-row {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Toast 提示 -->
+    <div class="toast toast-info" id="toast"></div>
+
+    <!-- 登录卡片 -->
+    <div class="login-container">
+        <div class="login-inner">
+
+            <!-- 徽标 -->
+            <div class="logo-section">
+                <div class="logo-icon">
+                    <span class="logo-icon-inner">⚖</span>
+                </div>
+            </div>
+
+            <!-- 标题 -->
+            <h1 class="app-title">智慧办案助手</h1>
+            <div class="title-divider"></div>
+            <span class="app-subtitle">Intelligent Case Handling Assistant</span>
+
+            <!-- 登录表单 -->
+            <form id="loginForm" autocomplete="off" novalidate>
+                <!-- 用户名 -->
+                <div class="form-group">
+                    <label class="form-label" for="username">用 户 名</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">👤</span>
+                        <input
+                        type="text"
+                        class="form-input"
+                        id="username"
+                        placeholder="请输入用户名"
+                        autocomplete="off"
+                        required
+                        >
+                    </div>
+                </div>
+
+                <!-- 密码 -->
+                <div class="form-group">
+                    <label class="form-label" for="password">密　　码</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">🔒</span>
+                        <input
+                        type="password"
+                        class="form-input"
+                        id="password"
+                        placeholder="请输入密码"
+                        autocomplete="new-password"
+                        required
+                        >
+                    </div>
+                </div>
+
+                <!-- 记住密码 & 忘记密码 -->
+                <div class="options-row">
+                    <label class="remember-me">
+                        <input type="checkbox" id="rememberMe">
+                        <span>记住密码</span>
+                    </label>
+                    <a class="forgot-link" onclick="handleForgotPassword()" title="忘记密码">忘记密码？</a>
+                </div>
+
+                <!-- 登录按钮 -->
+                <button type="submit" class="btn-login" id="loginBtn">
+                    登 录 系 统
+                </button>
+            </form>
+
+            <!-- 底部 -->
+            <div class="login-footer">
+                <span>🔐</span> 安全登录 · 数据加密传输
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM 元素
+        const loginForm = document.getElementById('loginForm');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const loginBtn = document.getElementById('loginBtn');
+        const rememberMe = document.getElementById('rememberMe');
+        const toast = document.getElementById('toast');
+
+        // Toast 提示
+        let toastTimer;
+
+        function showToast(message, type = 'info') {
+            clearTimeout(toastTimer);
+            toast.textContent = message;
+            toast.className = 'toast';
+            // 强制回流
+            void toast.offsetWidth;
+            toast.classList.add('toast-' + type, 'show');
+            toastTimer = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        // 移除输入框错误状态
+        function clearErrors() {
+            usernameInput.classList.remove('error');
+            passwordInput.classList.remove('error');
+        }
+
+        // 设置输入框错误
+        function setInputError(input) {
+            input.classList.add('error');
+            setTimeout(() => {
+                input.classList.remove('error');
+            }, 800);
+        }
+
+        // 模拟登录请求
+        function simulateLogin(username, password) {
+            return new Promise((resolve, reject) => {
+                // 模拟网络延迟
+                setTimeout(() => {
+                    // 演示逻辑：用户名和密码均不能为空，且长度 >= 3
+                    if (!username || username.trim().length < 2) {
+                        reject({ field: 'username', message: '请输入有效的用户名' });
+                        return;
+                    }
+                    if (!password || password.trim().length < 3) {
+                        reject({ field: 'password', message: '密码长度不能少于3位' });
+                        return;
+                    }
+                    // 模拟成功
+                    resolve({
+                        token: 'demo_token_' + Date.now(),
+                        username: username.trim(),
+                        timestamp: new Date().toISOString()
+                    });
+                }, 800 + Math.random() * 400);
+            });
+        }
+
+        // 表单提交
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            clearErrors();
+
+            const username = usernameInput.value;
+            const password = passwordInput.value;
+
+            // 前端初步校验
+            if (!username || username.trim() === '') {
+                setInputError(usernameInput);
+                showToast('请输入用户名', 'error');
+                usernameInput.focus();
+                return;
+            }
+            if (!password || password.trim() === '') {
+                setInputError(passwordInput);
+                showToast('请输入密码', 'error');
+                passwordInput.focus();
+                return;
+            }
+
+            // 禁用按钮，显示加载状态
+            loginBtn.disabled = true;
+            loginBtn.textContent = '验证中…';
+            showToast('正在验证身份…', 'info');
+
+            try {
+                const result = await simulateLogin(username, password);
+
+                // 登录成功
+                showToast('✅ 登录成功，欢迎使用智慧办案助手！', 'success');
+
+                // 记住密码功能
+                if (rememberMe.checked) {
+                    try {
+                        localStorage.setItem('zha_login_username', username);
+                        localStorage.setItem('zha_login_remember', 'true');
+                    } catch (e) {
+                        // localStorage 不可用
+                    }
+                } else {
+                    try {
+                        localStorage.removeItem('zha_login_username');
+                        localStorage.removeItem('zha_login_remember');
+                    } catch (e) {}
+                }
+
+                console.log('登录成功:', result);
+
+                // 模拟跳转（实际项目中替换为路由跳转）
+                setTimeout(() => {
+                    showToast('正在进入系统…', 'info');
+                     
+                    window.location.href = '/'; // 跳转到首页
+                }, 1200);
+
+            } catch (error) {
+                // 登录失败
+                loginBtn.disabled = false;
+                loginBtn.textContent = '登 录 系 统';
+
+                if (error.field === 'username') {
+                    setInputError(usernameInput);
+                    usernameInput.focus();
+                } else if (error.field === 'password') {
+                    setInputError(passwordInput);
+                    passwordInput.focus();
+                }
+                showToast('❌ ' + error.message, 'error');
+            } finally {
+                // 如果成功则不恢复按钮（页面将跳转）
+                if (!loginBtn.disabled === false) {
+                    // 按钮仍为disabled说明可能成功，不做处理
+                } else {
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = '登 录 系 统';
+                }
+            }
+        });
+
+        // 忘记密码
+        function handleForgotPassword() {
+            showToast('请联系系统管理员重置密码', 'info');
+        }
+
+        // 回车键快捷登录
+        usernameInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                passwordInput.focus();
+            }
+        });
+        passwordInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                loginBtn.click();
+            }
+        });
+
+        // 页面加载时检查记住密码
+        (function initRememberMe() {
+            try {
+                const remembered = localStorage.getItem('zha_login_remember');
+                const savedUsername = localStorage.getItem('zha_login_username');
+                if (remembered === 'true' && savedUsername) {
+                    usernameInput.value = savedUsername;
+                    rememberMe.checked = true;
+                    // 光标移到密码框
+                    setTimeout(() => {
+                        passwordInput.focus();
+                    }, 300);
+                } else {
+                    usernameInput.focus();
+                }
+            } catch (e) {
+                usernameInput.focus();
+            }
+        })();
+
+        // 点击输入框清除错误状态
+        usernameInput.addEventListener('focus', function() {
+            this.classList.remove('error');
+        });
+        passwordInput.addEventListener('focus', function() {
+            this.classList.remove('error');
+        });
+
+        console.log('⚖️  智慧办案助手 - 登录界面已就绪');
+        console.log('   👤 用户名输入框');
+        console.log('   🔒 密码输入框');
+        console.log('   ✅ 点击"登录系统"或按回车键提交');
+        console.log('   💡 演示：输入任意用户名（≥2字符）和密码（≥3字符）即可模拟登录');
+    </script>
+</body>
+</html>

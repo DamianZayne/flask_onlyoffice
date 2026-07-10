@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智慧办案助手 - 工作台</title>
+    <style>
+        :root {
+            --primary: #8B1A1A;
+            --primary-dark: #6B0F0F;
+            --primary-light: #A52A2A;
+            --accent: #C0392B;
+            --gold: #B8860B;
+            --gold-light: #D4A843;
+            --bg-page: #f5f0e8;
+            --bg-card: #fffefc;
+            --bg-header: #2a1f18;
+            --bg-header-secondary: #3d2e1f;
+            --text-dark: #2a2018;
+            --text-secondary: #5a4d3e;
+            --text-muted: #8a7b6b;
+            --text-light: #e8d8c8;
+            --border-color: #d5cdc3;
+            --border-light: #e8e0d6;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.10);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.16);
+            --radius: 6px;
+            --radius-sm: 4px;
+            --radius-lg: 10px;
+            --transition: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", "STSong", "SimSun", "宋体", serif;
+            background: var(--bg-page);
+            background-image:
+                radial-gradient(ellipse at 20% 10%, rgba(139, 26, 26, 0.025) 0%, transparent 55%),
+                radial-gradient(ellipse at 80% 90%, rgba(139, 26, 26, 0.02) 0%, transparent 50%);
+            min-height: 100vh;
+            color: var(--text-dark);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* 顶部导航栏 */
+        .top-nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--bg-header);
+            background-image: linear-gradient(180deg, #35281d 0%, #2a1f18 100%);
+            border-bottom: 2px solid #5a3e28;
+            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.22);
+            padding: 0 28px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .nav-brand-icon {
+            font-size: 26px;
+            line-height: 1;
+        }
+
+        .nav-brand-text {
+            font-size: 19px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: #e8d8c8;
+            font-family: "STZhongsong", "SimSun", "PingFang SC", serif;
+            white-space: nowrap;
+        }
+
+        .nav-brand-divider {
+            width: 1.5px;
+            height: 22px;
+            background: #6b5040;
+            border-radius: 1px;
+        }
+
+        .nav-brand-sub {
+            font-size: 12.5px;
+            color: #b5a090;
+            letter-spacing: 2px;
+            font-weight: 400;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .nav-user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 14px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            cursor: default;
+            transition: all var(--transition);
+        }
+
+        .nav-user-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #6b5040;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            color: #e8d8c8;
+            flex-shrink: 0;
+        }
+
+        .nav-user-name {
+            font-size: 13.5px;
+            color: #e0d0c0;
+            letter-spacing: 1px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .nav-user-role {
+            font-size: 11px;
+            color: #a09080;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-btn {
+            padding: 8px 15px;
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 1.5px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all var(--transition);
+            font-family: inherit;
+            border: 1.5px solid rgba(255, 255, 255, 0.18);
+            background: transparent;
+            color: #d5c5b5;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.30);
+            color: #f0e0d0;
+            transform: translateY(-1px);
+        }
+
+        .nav-btn:active {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(0);
+        }
+
+        .nav-btn.btn-exit {
+            border-color: rgba(200, 120, 100, 0.35);
+            color: #d4a090;
+        }
+
+        .nav-btn.btn-exit:hover {
+            background: rgba(180, 80, 60, 0.15);
+            border-color: rgba(200, 120, 100, 0.55);
+            color: #e8b0a0;
+        }
+
+        .nav-btn-icon {
+            font-size: 15px;
+        }
+
+        /* 主内容区 */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px 28px 40px;
+        }
+
+        /* 操作栏 */
+        .action-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .btn-primary {
+            padding: 11px 22px;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all var(--transition);
+            font-family: inherit;
+            border: none;
+            color: #fff;
+            background: linear-gradient(135deg, var(--primary) 0%, #9B2020 50%, var(--primary-dark) 100%);
+            box-shadow: 0 3px 12px rgba(139, 26, 26, 0.25);
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            white-space: nowrap;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #9B2020 0%, #a52020 50%, #7a1515 100%);
+            box-shadow: 0 5px 18px rgba(139, 26, 26, 0.35);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(139, 26, 26, 0.22);
+        }
+
+        .btn-outline {
+            padding: 11px 22px;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all var(--transition);
+            font-family: inherit;
+            border: 1.8px solid #c5b8a5;
+            background: #fffefc;
+            color: #4a3f35;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            white-space: nowrap;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-outline:hover {
+            background: #fdf9f4;
+            border-color: #a09080;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-outline:active {
+            background: #f5efe6;
+            transform: translateY(0);
+        }
+
+        .btn-icon-text {
+            font-size: 16px;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            max-width: 340px;
+            position: relative;
+            margin-left: auto;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 16px 10px 40px;
+            font-size: 14px;
+            font-family: inherit;
+            letter-spacing: 0.8px;
+            border: 1.8px solid #d5cdc3;
+            border-radius: 22px;
+            background: #fffefc;
+            color: var(--text-dark);
+            transition: all var(--transition);
+            outline: none;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .search-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(192, 57, 43, 0.06);
+        }
+
+        .search-input::placeholder {
+            color: #c5bfb5;
+            letter-spacing: 0.5px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+            color: #b5a998;
+            pointer-events: none;
+        }
+
+        /* 统计卡片 */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 22px;
+        }
+
+        .stat-card {
+            background: #fffefc;
+            border: 1.5px solid #e8e0d6;
+            border-radius: var(--radius);
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition);
+        }
+
+        .stat-card:hover {
+            box-shadow: var(--shadow-md);
+            border-color: #d5cdc3;
+            transform: translateY(-2px);
+        }
+
+        .stat-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .stat-icon.total {
+            background: #fdf6f0;
+            color: #8B1A1A;
+        }
+
+        .stat-icon.active {
+            background: #fef9f0;
+            color: #B8860B;
+        }
+
+        .stat-icon.done {
+            background: #f0f7f0;
+            color: #3d6b3d;
+        }
+
+        .stat-value {
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #2a2018;
+            line-height: 1.2;
+        }
+
+        .stat-label {
+            font-size: 12.5px;
+            color: #8a7b6b;
+            letter-spacing: 1px;
+        }
+
+        /* 表格容器 */
+        .table-card {
+            background: #fffefc;
+            border: 1.5px solid #e8e0d6;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+
+        .table-card-header {
+            padding: 16px 20px;
+            border-bottom: 1.5px solid #e8e0d6;
+            font-weight: 700;
+            font-size: 15px;
+            letter-spacing: 2px;
+            color: #3d2e1f;
+            background: #fdfaf6;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            min-width: 750px;
+        }
+
+        .data-table thead th {
+            background: #faf6f0;
+            color: #3d2e1f;
+            font-weight: 700;
+            padding: 13px 12px;
+            text-align: center;
+            letter-spacing: 1.2px;
+            font-size: 13.5px;
+            border-bottom: 2.5px solid #c5b8a5;
+            white-space: nowrap;
+        }
+
+        .data-table thead th.col-seq {
+            width: 55px;
+        }
+
+        .data-table thead th.col-name {
+            text-align: left;
+            padding-left: 16px;
+        }
+
+        .data-table thead th.col-person {
+            text-align: left;
+        }
+
+        .data-table thead th.col-unit {
+            text-align: left;
+        }
+
+        .data-table thead th.col-date {
+            width: 110px;
+        }
+
+        .data-table thead th.col-status {
+            width: 90px;
+        }
+
+        .data-table thead th.col-actions {
+            width: 150px;
+        }
+
+        .data-table tbody tr {
+            transition: background var(--transition);
+            border-bottom: 1px solid #eae3d9;
+        }
+
+        .data-table tbody tr:nth-child(odd) {
+            background: #fefdfa;
+        }
+
+        .data-table tbody tr:nth-child(even) {
+            background: #fff;
+        }
+
+        .data-table tbody tr:hover {
+            background: #fdf5ec;
+            outline: 1px solid #e8cfb0;
+            outline-offset: -1px;
+        }
+
+        .data-table tbody td {
+            padding: 12px 10px;
+            vertical-align: middle;
+            text-align: center;
+            font-size: 13.5px;
+        }
+
+        .data-table .td-name {
+            text-align: left;
+            padding-left: 16px;
+            font-weight: 500;
+            color: #2a2018;
+            letter-spacing: 0.5px;
+        }
+
+        .data-table .td-person {
+            text-align: left;
+            color: #3d2e1f;
+            letter-spacing: 0.5px;
+        }
+
+        .data-table .td-unit {
+            text-align: left;
+            color: #5a4d3e;
+            font-size: 13px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+
+        .status-badge.active-status {
+            background: #fef5e7;
+            color: #b87830;
+            border: 1px solid #e8cfb0;
+        }
+
+        .status-badge.done-status {
+            background: #eef7ee;
+            color: #3d6b3d;
+            border: 1px solid #c0d8c0;
+        }
+
+        .table-actions {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-sm {
+            padding: 6px 13px;
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.8px;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all var(--transition);
+            font-family: inherit;
+            border: 1.5px solid transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            white-space: nowrap;
+        }
+
+        .btn-sm-view {
+            background: #f8f5f0;
+            border-color: #cdc3b5;
+            color: #5a4d3e;
+        }
+
+        .btn-sm-view:hover {
+            background: #f0ebe2;
+            border-color: #b5a998;
+        }
+
+        .btn-sm-edit {
+            background: #fdf6ef;
+            border-color: #d6b896;
+            color: #8b5a2b;
+        }
+
+        .btn-sm-edit:hover {
+            background: #f9ecdb;
+            border-color: #c09060;
+        }
+
+        .btn-sm-delete {
+            background: #fef8f6;
+            border-color: #e0c0b8;
+            color: #a04040;
+        }
+
+        .btn-sm-delete:hover {
+            background: #fdf0ec;
+            border-color: #c89080;
+            color: #8B1A1A;
+        }
+
+        .btn-sm-icon {
+            font-size: 14px;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 48px 20px;
+            color: #b5a998;
+            letter-spacing: 1px;
+            font-size: 14px;
+        }
+
+        .empty-state-icon {
+            font-size: 40px;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        /* 模态弹窗 */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(30, 20, 14, 0.55);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.25s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-dialog {
+            background: #fffefc;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg), 0 0 0 1px rgba(0, 0, 0, 0.06);
+            width: 100%;
+            max-width: 560px;
+            max-height: 85vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+            position: relative;
+        }
+
+        .modal-dialog.modal-wide {
+            max-width: 780px;
+        }
+
+        .modal-header {
+            padding: 18px 24px;
+            border-bottom: 1.5px solid #e8e0d6;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            background: #fffefc;
+            z-index: 1;
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        }
+
+        .modal-title {
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #3d2e1f;
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 1.5px solid #d5cdc3;
+            background: #fff;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition);
+            color: #8a7b6b;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            background: #fdf5ec;
+            border-color: #b5a998;
+            color: #3d2e1f;
+        }
+
+        .modal-body {
+            padding: 22px 24px;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1.5px solid #e8e0d6;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .form-group-modal {
+            margin-bottom: 16px;
+        }
+
+        .form-label-modal {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #4a3f35;
+            letter-spacing: 1.2px;
+            margin-bottom: 6px;
+        }
+
+        .form-input-modal {
+            width: 100%;
+            padding: 10px 14px;
+            font-size: 14px;
+            font-family: inherit;
+            letter-spacing: 0.6px;
+            border: 1.8px solid #d5cdc3;
+            border-radius: var(--radius-sm);
+            background: #fffefc;
+            color: var(--text-dark);
+            transition: all var(--transition);
+            outline: none;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .form-input-modal:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.06);
+        }
+
+        .form-input-modal::placeholder {
+            color: #c5bfb5;
+        }
+
+        select.form-input-modal {
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%238a7b6b' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 16px;
+            padding-right: 34px;
+        }
+
+        .btn-cancel {
+            padding: 9px 20px;
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-family: inherit;
+            border: 1.5px solid #d5cdc3;
+            background: #fff;
+            color: #5a4d3e;
+            transition: all var(--transition);
+        }
+
+        .btn-cancel:hover {
+            background: #fdf9f4;
+            border-color: #b5a998;
+        }
+
+        .btn-confirm {
+            padding: 9px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-family: inherit;
+            border: none;
+            color: #fff;
+            background: var(--primary);
+            transition: all var(--transition);
+            box-shadow: 0 2px 8px rgba(139, 26, 26, 0.2);
+        }
+
+        .btn-confirm:hover {
+            background: #9B2020;
+            box-shadow: 0 4px 14px rgba(139, 26, 26, 0.3);
+        }
+
+        .btn-confirm-danger {
+            background: #c0392b;
+        }
+
+        .btn-confirm-danger:hover {
+            background: #a02020;
+        }
+
+        /* 模板配置列表 */
+        .template-list {
+            list-style: none;
+            display: grid;
+            gap: 6px;
+        }
+
+        .template-list li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            background: #fefdfb;
+            border: 1px solid #e8e0d6;
+            font-size: 13.5px;
+            letter-spacing: 0.5px;
+        }
+
+        .template-list li label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .template-list li input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-130px);
+            padding: 12px 26px;
+            border-radius: 24px;
+            font-size: 14px;
+            letter-spacing: 1px;
+            z-index: 300;
+            pointer-events: none;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.25);
+            font-family: inherit;
+            white-space: nowrap;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast-success { background: #2d5016; color: #e8f5d8; }
+        .toast-error { background: #7a1a1a; color: #fde8e8; }
+        .toast-info { background: #3d2e1f; color: #fdf6ef; }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .top-nav { padding: 0 12px; height: 52px; gap: 8px; }
+            .nav-brand-text { font-size: 15px; letter-spacing: 1.5px; }
+            .nav-brand-sub { display: none; }
+            .nav-brand-divider { display: none; }
+            .nav-btn { padding: 6px 10px; font-size: 11px; letter-spacing: 0.8px; gap: 3px; }
+            .nav-user-name { font-size: 12px; }
+            .nav-user-role { display: none; }
+            .main-content { padding: 16px 10px 30px; }
+            .action-bar { gap: 8px; }
+            .btn-primary, .btn-outline { padding: 9px 14px; font-size: 12px; letter-spacing: 1px; }
+            .search-box { max-width: 100%; flex: 1 1 100%; order: 10; }
+            .data-table { font-size: 12px; min-width: 600px; }
+            .data-table thead th { font-size: 11px; padding: 8px 6px; }
+            .data-table tbody td { padding: 8px 6px; font-size: 12px; }
+            .btn-sm { padding: 4px 9px; font-size: 10px; }
+            .modal-dialog { max-width: 95vw; margin: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Toast -->
+    <div class="toast toast-info" id="toast"></div>
+
+    <!-- 顶部导航栏 -->
+    <nav class="top-nav">
+        <div class="nav-brand">
+            <span class="nav-brand-icon">⚖️</span>
+            <span class="nav-brand-text">智慧办案助手</span>
+            <span class="nav-brand-divider"></span>
+            <span class="nav-brand-sub">工作台</span>
+        </div>
+        <div class="nav-actions">
+            <div class="nav-user-info" id="userInfoDisplay">
+                <div class="nav-user-avatar">👤</div>
+                <div>
+                    <div class="nav-user-name" id="displayUserName">张××</div>
+                    <div class="nav-user-role">审查调查员</div>
+                </div>
+            </div>
+            <button class="nav-btn" onclick="openChangePasswordModal()" title="修改密码">
+                <span class="nav-btn-icon">🔑</span> 修改密码
+            </button>
+            <button class="nav-btn btn-exit" onclick="handleLogout()" title="退出系统">
+                <span class="nav-btn-icon">🚪</span> 退出
+            </button>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <div class="main-content">
+
+        <!-- 统计卡片 -->
+        <div class="stats-row" id="statsRow">
+            <div class="stat-card">
+                <div class="stat-icon total">📋</div>
+                <div>
+                    <div class="stat-value" id="statTotal">0</div>
+                    <div class="stat-label">安全卷总数</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon active">📝</div>
+                <div>
+                    <div class="stat-value" id="statActive">0</div>
+                    <div class="stat-label">进行中</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon done">✅</div>
+                <div>
+                    <div class="stat-value" id="statDone">0</div>
+                    <div class="stat-label">已结案</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 操作栏 -->
+        <div class="action-bar">
+            <button class="btn-primary" onclick="openAddModal()">
+                <span class="btn-icon-text">＋</span> 业务新增
+            </button>
+            <button class="btn-outline" onclick="openReplaceModal()">
+                <span class="btn-icon-text">🔄</span> 批量替换
+            </button>
+            <button class="btn-outline" onclick="openTemplateModal()">
+                <span class="btn-icon-text">⚙️</span> 模板配置
+            </button>
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" id="searchInput" placeholder="搜索案件名称或被审查调查人…" oninput="filterTable()">
+            </div>
+        </div>
+
+        <!-- 数据表格 -->
+        <div class="table-card">
+            <div class="table-card-header">
+                📄 已录入安全卷
+                <span style="font-weight:400;font-size:12px;color:#8a7b6b;margin-left:8px;" id="recordCount">（共 0 条记录）</span>
+            </div>
+            <div class="table-wrap">
+                <table class="data-table" id="dataTable">
+                    <thead>
+                        <tr>
+                            <th class="col-seq">序号</th>
+                            <th class="col-name">案件名称</th>
+                            <th class="col-person">被审查调查人</th>
+                            <th class="col-unit">办案单位</th>
+                            <th class="col-date">立卷日期</th>
+                            <th class="col-status">状态</th>
+                            <th class="col-actions">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+                <div class="empty-state" id="emptyState" style="display:none;">
+                    <span class="empty-state-icon">📭</span>
+                    暂无安全卷记录，请点击"业务新增"创建
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 业务新增弹窗 -->
+    <div class="modal-overlay" id="addModal" style="display:none;" onclick="if(event.target===this)closeAddModal()">
+        <div class="modal-dialog" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <span class="modal-title">📝 业务新增 - 安全卷</span>
+                <button class="modal-close" onclick="closeAddModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group-modal">
+                    <label class="form-label-modal">案件名称 <span style="color:#c0392b;">*</span></label>
+                    <input type="text" class="form-input-modal" id="addCaseName" placeholder="请输入案件名称">
+                </div>
+                <div class="form-group-modal">
+                    <label class="form-label-modal">被审查调查人 <span style="color:#c0392b;">*</span></label>
+                    <input type="text" class="form-input-modal" id="addSubjectName" placeholder="请输入被审查调查人姓名">
+                </div>
+                <div class="form-group-modal">
+                    <label class="form-label-modal">办案单位</label>
+                    <input type="text" class="form-input-modal" id="addUnitName" placeholder="请输入办案单位名称">
+                </div>
+                <div class="form-group-modal">
+                    <label class="form-label-modal">立卷人</label>
+                    <input type="text" class="form-input-modal" id="addArchivist" placeholder="立卷人签名">
+                </div>
+                <div class="form-group-modal">
+                    <label class="form-label-modal">状态</label>
+                    <select class="form-input-modal" id="addStatus">
+                        <option value="active">进行中</option>
+                        <option value="done">已结案</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeAddModal()">取 消</button>
+                <button class="btn-confirm" onclick="confirmAdd()">✓ 确认新增</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模板配置弹窗 -->
+    <div class="modal-overlay" id="templateModal" style="display:none;" onclick="if(event.target===this)closeTemplateModal()">
+        <div class="modal-dialog modal-wide" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <span class="modal-title">⚙️ 安全卷模板配置</span>
+                <button class="modal-close" onclick="closeTemplateModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size:13px;color:#8a7b6b;margin-bottom:14px;letter-spacing:0.5px;">
+                    勾选默认包含在安全卷中的材料项（带 <span style="color:#c0392b;">*</span> 的为必选项）
+                </p>
+                <ul class="template-list" id="templateList"></ul>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeTemplateModal()">取 消</button>
+                <button class="btn-confirm" onclick="confirmTemplate()">✓ 保存配置</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 修改密码弹窗 -->
+    <div class="modal-overlay" id="passwordModal" style="display:none;" onclick="if(event.target===this)closePasswordModal()">
+        <div class="modal-dialog" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <span class="modal-title">🔑 修改密码</span>
+                <button class="modal-close" onclick="closePasswordModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group-modal">
+                    <label class="form-label-modal">原密码 <span style="color:#c0392b;">*</span></label>
+                    <input type="password" class="form-input-modal" id="oldPassword" placeholder="请输入原密码">
+                </div>
+                <div class="form-group-modal">
+                    <label class="form-label-modal">新密码 <span style="color:#c0392b;">*</span></label>
+                    <input type="password" class="form-input-modal" id="newPassword" placeholder="请输入新密码（至少6位）">
+                </div>
+                <div class="form-group-modal">
+                    <label class="form-label-modal">确认新密码 <span style="color:#c0392b;">*</span></label>
+                    <input type="password" class="form-input-modal" id="confirmPassword" placeholder="请再次输入新密码">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closePasswordModal()">取 消</button>
+                <button class="btn-confirm" onclick="confirmChangePassword()">✓ 确认修改</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 批量替换弹窗 -->
+    <div class="modal-overlay" id="replaceModal" style="display:none;" onclick="if(event.target===this)closeReplaceModal()">
+        <div class="modal-dialog modal-wide" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <span class="modal-title">🔄 文档批量替换</span>
+                <button class="modal-close" onclick="closeReplaceModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group-modal">
+                    <label class="form-label-modal">选择文档</label>
+                    <select class="form-input-modal" id="replaceDocSelect">
+                        <option value="">— 请选择 Edit_Doc 中的文档 —</option>
+                    </select>
+                </div>
+                <div style="margin-bottom:12px;">
+                    <label class="form-label-modal">替换规则</label>
+                    <div id="replaceRules">
+                        <div class="replace-row" style="display:flex;gap:8px;align-items:center;margin-bottom:6px;">
+                            <input type="text" class="form-input-modal" placeholder="查找文本（旧词）" style="flex:1;" data-role="find">
+                            <span style="color:#8a7b6b;">→</span>
+                            <input type="text" class="form-input-modal" placeholder="替换为（新词）" style="flex:1;" data-role="replace">
+                            <button class="btn-sm btn-sm-delete" onclick="removeReplaceRow(this)" style="flex-shrink:0;" title="删除此规则">✕</button>
+                        </div>
+                    </div>
+                    <button class="btn-sm btn-sm-edit" onclick="addReplaceRow()" style="margin-top:6px;">
+                        <span class="btn-sm-icon">＋</span> 增加替换规则
+                    </button>
+                </div>
+                <p style="font-size:12px;color:#999;margin-bottom:0;">替换会直接修改 Edit_Doc 中的原文件，请确认无误后保存。</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeReplaceModal()">取 消</button>
+                <button class="btn-confirm" onclick="confirmReplace()">💾 保存并替换</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 删除确认弹窗 -->
+    <div class="modal-overlay" id="deleteModal" style="display:none;" onclick="if(event.target===this)closeDeleteModal()">
+        <div class="modal-dialog" onclick="event.stopPropagation()" style="max-width:420px;">
+            <div class="modal-header">
+                <span class="modal-title">⚠️ 确认删除</span>
+                <button class="modal-close" onclick="closeDeleteModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size:14px;color:#5a4d3e;letter-spacing:0.5px;text-align:center;" id="deleteMessage">
+                    确定要删除该安全卷记录吗？此操作不可恢复。
+                </p>
+            </div>
+            <div class="modal-footer" style="justify-content:center;">
+                <button class="btn-cancel" onclick="closeDeleteModal()">取 消</button>
+                <button class="btn-confirm btn-confirm-danger" id="confirmDeleteBtn">✓ 确认删除</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== 全局数据 ====================
+        const currentUser = { name: '张××', role: '审查调查员', password: '123456' };
+
+        const defaultTemplateItems = [
+            { id: 1, name: '安全首课记录', note: '（每个线索初核前/立案审查调查阶段写该部分内容）', required: true, enabled: true },
+            { id: 2, name: '安全责任书', note: '（所有办案人员逐人逐份签字）', required: true, enabled: true },
+            { id: 3, name: '承诺书', note: '（初核和立案审查调查阶段都需要）', required: true, enabled: true },
+            { id: 4, name: '谈话方案和安全预案呈阅件', note: '（经领导签字后的）', required: true, enabled: true },
+            { id: 5, name: '走读式谈话安全评估情况及安全预案', note: '（姓名，*月*日）', required: false, enabled: true },
+            { id: 6, name: '走读式谈话安全评估表', note: '（姓名，*月*日）', required: false, enabled: true },
+            { id: 7, name: '谈话方案', note: '（根据被审查调查人职级确定领导首谈）', required: false, enabled: true },
+            { id: 8, name: '采取谈话（询问、讯问）措施呈批表', note: '（用于新增加人员）', required: false, enabled: true },
+            { id: 9, name: '谈话对象人员名单', note: '', required: false, enabled: true },
+            { id: 10, name: '暂予保管物品登记表', note: '（姓名，*月*日）', required: false, enabled: true },
+            { id: 11, name: '谈话对象体检情况登记表', note: '（姓名，*月*日）', required: false, enabled: true },
+            { id: 12, name: '陪送交接单', note: '（姓名，*月*日）', required: false, enabled: true },
+            { id: 13, name: '谈话（讯问、询问）工作记录', note: '（姓名，*月*日）', required: false, enabled: true },
+            { id: 14, name: '有关工作情况说明', note: '（出现非正常情况时作此说明）', required: false, enabled: false },
+            { id: 15, name: '审查调查安全责任明细表', note: '', required: false, enabled: true },
+            { id: 16, name: '专章总结记录', note: '（只在案件结案后写该部分内容）', required: false, enabled: false },
+            { id: 17, name: '谈话录音录像交接表', note: '', required: false, enabled: true },
+        ];
+
+        let caseRecords = [
+            { id: 1, caseName: '×××受贿案', subjectName: '李××', unitName: '××市纪委监委第一审查调查室', archiveDate: '2026-03-15', status: 'active', archivist: '王××', reviewer: '赵××' },
+            { id: 2, caseName: '×××滥用职权案', subjectName: '陈××', unitName: '××市纪委监委第二审查调查室', archiveDate: '2026-04-02', status: 'active', archivist: '刘××', reviewer: '周××' },
+            { id: 3, caseName: '×××贪污案', subjectName: '黄××', unitName: '××区纪委监委', archiveDate: '2026-01-20', status: 'done', archivist: '吴××', reviewer: '郑××' },
+            { id: 4, caseName: '×××违纪违法案', subjectName: '林××', unitName: '××市纪委监委第三审查调查室', archiveDate: '2026-05-10', status: 'active', archivist: '孙××', reviewer: '钱××' },
+            { id: 5, caseName: '×××失职渎职案', subjectName: '杨××', unitName: '××县纪委监委', archiveDate: '2025-11-08', status: 'done', archivist: '马××', reviewer: '朱××' },
+        ];
+
+        let nextId = 6;
+        let templateConfig = JSON.parse(JSON.stringify(defaultTemplateItems));
+        let deleteTargetId = null;
+
+        // ==================== Toast ====================
+        let toastTimer;
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            clearTimeout(toastTimer);
+            toast.textContent = message;
+            toast.className = 'toast';
+            void toast.offsetWidth;
+            toast.classList.add('toast-' + type, 'show');
+            toastTimer = setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+
+        // ==================== 表格渲染 ====================
+        function renderTable(data) {
+            const tbody = document.getElementById('tableBody');
+            const emptyState = document.getElementById('emptyState');
+            const recordCount = document.getElementById('recordCount');
+
+            if (!data || data.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.style.display = 'block';
+                recordCount.textContent = '（共 0 条记录）';
+                updateStats(data);
+                return;
+            }
+            emptyState.style.display = 'none';
+            recordCount.textContent = '（共 ' + data.length + ' 条记录）';
+
+            tbody.innerHTML = data.map((record, index) => {
+                const statusHtml = record.status === 'active' ?
+                    '<span class="status-badge active-status">进行中</span>' :
+                    '<span class="status-badge done-status">已结案</span>';
+
+                const mainActionBtn = record.status === 'active'
+                    ? `<button class="btn-sm btn-sm-edit" onclick="openEditor(${record.id})" title="编辑安全卷">
+                         <span class="btn-sm-icon">✏️</span> 编辑
+                       </button>`
+                    : `<button class="btn-sm btn-sm-view" onclick="openViewer(${record.id})" title="查看安全卷">
+                         <span class="btn-sm-icon">👁️</span> 查看
+                       </button>`;
+
+                return `
+                    <tr>
+                        <td class="td-seq">${index + 1}</td>
+                        <td class="td-name">${escapeHtml(record.caseName)}</td>
+                        <td class="td-person">${escapeHtml(record.subjectName)}</td>
+                        <td class="td-unit">${escapeHtml(record.unitName) || '—'}</td>
+                        <td>${record.archiveDate || '—'}</td>
+                        <td>${statusHtml}</td>
+                        <td>
+                            <div class="table-actions">
+                                ${mainActionBtn}
+                                <button class="btn-sm btn-sm-delete" onclick="openDeleteModal(${record.id})" title="删除该记录">
+                                    <span class="btn-sm-icon">🗑️</span> 删除
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            updateStats(data);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function updateStats(data) {
+            const total = data.length;
+            const activeCount = data.filter(r => r.status === 'active').length;
+            const doneCount = data.filter(r => r.status === 'done').length;
+            document.getElementById('statTotal').textContent = total;
+            document.getElementById('statActive').textContent = activeCount;
+            document.getElementById('statDone').textContent = doneCount;
+        }
+
+        function filterTable() {
+            const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+            if (!keyword) {
+                renderTable(caseRecords);
+                return;
+            }
+            const filtered = caseRecords.filter(r =>
+                r.caseName.toLowerCase().includes(keyword) ||
+                r.subjectName.toLowerCase().includes(keyword) ||
+                (r.unitName && r.unitName.toLowerCase().includes(keyword))
+            );
+            renderTable(filtered);
+        }
+
+        // ==================== 新窗口编辑/查看 ====================
+        function openEditor(recordId) {
+            window.open(`/security-catalog?id=${recordId}`, '_blank');
+        }
+
+        function openViewer(recordId) {
+            window.open(`安全卷录入.html?id=${recordId}`, '_blank');
+        }
+
+        // ==================== 业务新增 ====================
+        function openAddModal() {
+            document.getElementById('addModal').style.display = 'flex';
+            document.getElementById('addCaseName').value = '';
+            document.getElementById('addSubjectName').value = '';
+            document.getElementById('addUnitName').value = '';
+            document.getElementById('addArchivist').value = '';
+            document.getElementById('addStatus').value = 'active';
+            document.getElementById('addCaseName').focus();
+        }
+        function closeAddModal() { document.getElementById('addModal').style.display = 'none'; }
+        function confirmAdd() {
+            const caseName = document.getElementById('addCaseName').value.trim();
+            const subjectName = document.getElementById('addSubjectName').value.trim();
+            const unitName = document.getElementById('addUnitName').value.trim();
+            const archivist = document.getElementById('addArchivist').value.trim();
+            const status = document.getElementById('addStatus').value;
+
+            if (!caseName) { showToast('请输入案件名称', 'error'); return; }
+            if (!subjectName) { showToast('请输入被审查调查人姓名', 'error'); return; }
+
+            const newRecord = {
+                id: nextId++,
+                caseName,
+                subjectName,
+                unitName: unitName || '—',
+                archiveDate: new Date().toISOString().split('T')[0],
+                status,
+                archivist: archivist || '—',
+                reviewer: '—',
+            };
+            caseRecords.unshift(newRecord);
+            closeAddModal();
+            renderTable(caseRecords);
+            document.getElementById('searchInput').value = '';
+            showToast('✅ 安全卷新增成功！', 'success');
+        }
+
+        // ==================== 模板配置 ====================
+        function openTemplateModal() {
+            const list = document.getElementById('templateList');
+            list.innerHTML = templateConfig.map(item => `
+                <li>
+                    <label>
+                        <input type="checkbox" ${item.required ? 'checked disabled' : ''} ${!item.required && item.enabled ? 'checked' : ''} data-id="${item.id}" class="template-checkbox">
+                        <span style="flex:1;">${item.name}</span>
+                        <span style="font-size:11px;color:#8a7b6b;">${item.note}</span>
+                        ${item.required ? '<span style="color:#c0392b;font-size:11px;">*必选</span>' : ''}
+                    </label>
+                </li>
+            `).join('');
+            document.getElementById('templateModal').style.display = 'flex';
+        }
+        function closeTemplateModal() { document.getElementById('templateModal').style.display = 'none'; }
+        function confirmTemplate() {
+            const checkboxes = document.querySelectorAll('.template-checkbox');
+            checkboxes.forEach(cb => {
+                const id = parseInt(cb.getAttribute('data-id'));
+                const item = templateConfig.find(t => t.id === id);
+                if (item && !item.required) item.enabled = cb.checked;
+            });
+            closeTemplateModal();
+            showToast('✅ 模板配置已保存！', 'success');
+        }
+
+        // ==================== 删除 ====================
+        function openDeleteModal(recordId) {
+            deleteTargetId = recordId;
+            const record = caseRecords.find(r => r.id === recordId);
+            if (record) {
+                document.getElementById('deleteMessage').textContent = `确定要删除「${record.caseName}」的安全卷记录吗？此操作不可恢复。`;
+            }
+            document.getElementById('deleteModal').style.display = 'flex';
+        }
+        function closeDeleteModal() { document.getElementById('deleteModal').style.display = 'none'; deleteTargetId = null; }
+        document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+            if (deleteTargetId !== null) {
+                caseRecords = caseRecords.filter(r => r.id !== deleteTargetId);
+                closeDeleteModal();
+                renderTable(caseRecords);
+                document.getElementById('searchInput').value = '';
+                showToast('🗑️ 记录已删除', 'info');
+            }
+        });
+
+        // ==================== 修改密码 ====================
+        function openChangePasswordModal() {
+            document.getElementById('passwordModal').style.display = 'flex';
+            document.getElementById('oldPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+            document.getElementById('oldPassword').focus();
+        }
+        function closePasswordModal() { document.getElementById('passwordModal').style.display = 'none'; }
+        function confirmChangePassword() {
+            const oldPwd = document.getElementById('oldPassword').value;
+            const newPwd = document.getElementById('newPassword').value;
+            const confirmPwd = document.getElementById('confirmPassword').value;
+            if (!oldPwd) { showToast('请输入原密码', 'error'); return; }
+            if (oldPwd !== currentUser.password) { showToast('原密码不正确', 'error'); return; }
+            if (!newPwd || newPwd.length < 6) { showToast('新密码至少需要6位字符', 'error'); return; }
+            if (newPwd !== confirmPwd) { showToast('两次输入的新密码不一致', 'error'); return; }
+            currentUser.password = newPwd;
+            closePasswordModal();
+            showToast('✅ 密码修改成功！', 'success');
+        }
+
+        // ==================== 退出 ====================
+        function handleLogout() {
+            if (confirm('确定要退出系统吗？')) {
+                showToast('👋 正在安全退出…', 'info');
+                setTimeout(() => {
+                    showToast('已安全退出，请重新登录', 'info');
+                    setTimeout(() => location.reload(), 1500);
+                }, 600);
+            }
+        }
+
+        // ==================== 批量替换 ====================
+        async function openReplaceModal() {
+            document.getElementById('replaceModal').style.display = 'flex';
+            // 加载文档列表
+            try {
+                const resp = await fetch('/api/edit-doc-list');
+                const files = await resp.json();
+                const select = document.getElementById('replaceDocSelect');
+                select.innerHTML = '<option value="">— 请选择 Edit_Doc 中的文档 —</option>';
+                files.forEach(f => {
+                    const label = f.material ? `[${f.material}] ${f.filename}` : f.filename;
+                    select.innerHTML += `<option value="${f.path}">${label}</option>`;
+                });
+            } catch (err) {
+                console.error('加载文档列表失败:', err);
+            }
+            // 重置替换规则为一行
+            document.getElementById('replaceRules').innerHTML = `
+                <div class="replace-row" style="display:flex;gap:8px;align-items:center;margin-bottom:6px;">
+                    <input type="text" class="form-input-modal" placeholder="查找文本（旧词）" style="flex:1;" data-role="find">
+                    <span style="color:#8a7b6b;">→</span>
+                    <input type="text" class="form-input-modal" placeholder="替换为（新词）" style="flex:1;" data-role="replace">
+                    <button class="btn-sm btn-sm-delete" onclick="removeReplaceRow(this)" style="flex-shrink:0;" title="删除此规则">✕</button>
+                </div>`;
+        }
+
+        function closeReplaceModal() {
+            document.getElementById('replaceModal').style.display = 'none';
+        }
+
+        function addReplaceRow() {
+            const row = document.createElement('div');
+            row.className = 'replace-row';
+            row.style.cssText = 'display:flex;gap:8px;align-items:center;margin-bottom:6px;';
+            row.innerHTML = `
+                <input type="text" class="form-input-modal" placeholder="查找文本（旧词）" style="flex:1;" data-role="find">
+                <span style="color:#8a7b6b;">→</span>
+                <input type="text" class="form-input-modal" placeholder="替换为（新词）" style="flex:1;" data-role="replace">
+                <button class="btn-sm btn-sm-delete" onclick="removeReplaceRow(this)" style="flex-shrink:0;" title="删除此规则">✕</button>`;
+            document.getElementById('replaceRules').appendChild(row);
+        }
+
+        function removeReplaceRow(btn) {
+            const rows = document.querySelectorAll('#replaceRules .replace-row');
+            if (rows.length <= 1) {
+                showToast('至少保留一条替换规则', 'error');
+                return;
+            }
+            btn.closest('.replace-row').remove();
+        }
+
+        async function confirmReplace() {
+            const filePath = document.getElementById('replaceDocSelect').value;
+            if (!filePath) { showToast('请选择要替换的文档', 'error'); return; }
+
+            const rows = document.querySelectorAll('#replaceRules .replace-row');
+            const replacements = {};
+            let hasEmpty = false;
+            rows.forEach(row => {
+                const find = row.querySelector('[data-role="find"]').value;
+                const replace = row.querySelector('[data-role="replace"]').value;
+                if (find) {
+                    replacements[find] = replace;
+                } else {
+                    hasEmpty = true;
+                }
+            });
+
+            if (Object.keys(replacements).length === 0) {
+                showToast('请填写至少一条替换规则', 'error'); return;
+            }
+
+            try {
+                const resp = await fetch('/api/batch-replace', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ file_path: filePath, replacements }),
+                });
+                const result = await resp.json();
+                if (result.error === 0) {
+                    showToast(`✅ ${result.message}！`, 'success');
+                    closeReplaceModal();
+                } else {
+                    showToast('❌ ' + result.message, 'error');
+                }
+            } catch (err) {
+                showToast('❌ 请求失败: ' + err.message, 'error');
+            }
+        }
+
+        // ==================== 初始化 ====================
+        function init() {
+            document.getElementById('displayUserName').textContent = currentUser.name;
+            renderTable(caseRecords);
+        }
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeAddModal(); closeTemplateModal(); closeDeleteModal(); closePasswordModal(); closeReplaceModal();
+            }
+            if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+                e.preventDefault();
+                document.getElementById('searchInput').focus();
+            }
+        });
+        init();
+    </script>
+</body>
+</html>
