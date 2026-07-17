@@ -872,146 +872,7 @@
 
         // ==================== 材料字段配置 ====================
         const materialForms = {
-            '安全首课记录': {
-                fields: [
-                    { label: '标题', type: 'text', placeholder: '请输入标题', required: true },
-                    { label: '时间', type: 'date', required: true },
-                    { label: '地点', type: 'text', placeholder: '例如：***室' },
-                    { label: '主持人', type: 'text', placeholder: '主持人姓名', required: true },
-                    { label: '参加人员', type: 'text', placeholder: '请列举参加人员（可使用列表）', rows: 3 },
-                    { label: '议题', type: 'text', placeholder: '会议议题内容', rows: 4 },
-                    { label: '学习内容', type: 'textarea', placeholder: '安全首课学习具体内容', rows: 6 }
-                ]
-            },
-            '安全责任书': {
-                fields: [
-                    { label: '签订日期', type: 'date', required: true },
-                    { label: '办案人员签名', type: 'textarea', placeholder: '所有办案人员逐人签名（每行一个）', rows: 4 },
-                    { label: '责任要求', type: 'textarea', placeholder: '安全责任具体要求', rows: 6 }
-                ]
-            },
-            '承诺书': {
-                fields: [
-                    { label: '承诺人', type: 'text', placeholder: '承诺人姓名', required: true },
-                    { label: '承诺日期', type: 'date', required: true },
-                    { label: '承诺内容', type: 'textarea', placeholder: '承诺遵守的安全纪律等内容', rows: 6 }
-                ]
-            },
-            '谈话方案和安全预案呈阅件': {
-                fields: [
-                    { label: '呈报日期', type: 'date', required: true },
-                    { label: '领导签字', type: 'text', placeholder: '领导签字' },
-                    { label: '方案摘要', type: 'textarea', placeholder: '谈话方案及安全预案摘要', rows: 6 }
-                ]
-            },
-            '走读式谈话安全评估情况及安全预案': {
-                fields: [
-                    { label: '被谈话人姓名', type: 'text', placeholder: '姓名', required: true },
-                    { label: '评估日期', type: 'date', required: true },
-                    { label: '风险评估等级', type: 'select', options: ['低风险', '中风险', '高风险'] },
-                    { label: '安全预案措施', type: 'textarea', placeholder: '详细安全预案措施', rows: 6 }
-                ]
-            },
-            '走读式谈话安全评估表': {
-                fields: [
-                    { label: '被谈话人', type: 'text', required: true },
-                    { label: '评估日期', type: 'date', required: true },
-                    { label: '身体状况评估', type: 'select', options: ['良好', '一般', '较差'] },
-                    { label: '心理状态评估', type: 'select', options: ['稳定', '焦虑', '不稳定'] },
-                    { label: '综合风险等级', type: 'select', options: ['低', '中', '高'] },
-                    { label: '评估人员签名', type: 'text', placeholder: '签名' }
-                ]
-            },
-            '谈话方案': {
-                fields: [
-                    { label: '制定日期', type: 'date', required: true },
-                    { label: '主谈人', type: 'text', placeholder: '领导首谈人员' },
-                    { label: '谈话地点', type: 'text', placeholder: '谈话室编号' },
-                    { label: '谈话提纲', type: 'textarea', placeholder: '详细谈话提纲', rows: 8 }
-                ]
-            },
-            '采取谈话（询问、讯问）措施呈批表': {
-                fields: [
-                    { label: '呈批日期', type: 'date', required: true },
-                    { label: '对象姓名', type: 'text', required: true },
-                    { label: '措施类型', type: 'select', options: ['谈话', '询问', '讯问'] },
-                    { label: '审批意见', type: 'textarea', placeholder: '审批意见', rows: 4 }
-                ]
-            },
-            '谈话对象人员名单': {
-                fields: [
-                    { label: '名单日期', type: 'date', required: true },
-                    { label: '人员列表', type: 'textarea', placeholder: '姓名、单位、职务（可使用编号列表）', rows: 6 }
-                ]
-            },
-            '暂予保管物品登记表': {
-                fields: [
-                    { label: '物品持有人', type: 'text', required: true },
-                    { label: '登记日期', type: 'date', required: true },
-                    { label: '物品清单', type: 'textarea', placeholder: '物品名称、数量、特征', rows: 5 },
-                    { label: '保管人', type: 'text', placeholder: '保管人签名' }
-                ]
-            },
-            '谈话对象体检情况登记表': {
-                fields: [
-                    { label: '体检人姓名', type: 'text', required: true },
-                    { label: '体检日期', type: 'date', required: true },
-                    { label: '血压', type: 'text', placeholder: '例如 120/80' },
-                    { label: '心率', type: 'text', placeholder: '次/分' },
-                    { label: '其他异常', type: 'textarea', placeholder: '无则填"无"', rows: 2 },
-                    { label: '医生签名', type: 'text' }
-                ]
-            },
-            '陪送交接单': {
-                fields: [
-                    { label: '被陪送人', type: 'text', required: true },
-                    { label: '陪送日期', type: 'date', required: true },
-                    { label: '陪送人', type: 'text', placeholder: '陪送人员签名' },
-                    { label: '接收人', type: 'text', placeholder: '接收单位人员签名' },
-                    { label: '备注', type: 'textarea', placeholder: '备注信息', rows: 3 }
-                ]
-            },
-            '谈话（讯问、询问）工作记录': {
-                fields: [
-                    { label: '谈话日期', type: 'date', required: true },
-                    { label: '谈话对象', type: 'text', required: true },
-                    { label: '谈话人', type: 'text', placeholder: '谈话人员签名' },
-                    { label: '记录人', type: 'text', placeholder: '记录人签名' },
-                    { label: '谈话内容摘要', type: 'textarea', placeholder: '工作记录摘要', rows: 8 }
-                ]
-            },
-            '有关工作情况说明': {
-                fields: [
-                    { label: '说明日期', type: 'date', required: true },
-                    { label: '异常情况描述', type: 'textarea', placeholder: '描述出现的非正常情况', rows: 5 },
-                    { label: '处理措施', type: 'textarea', placeholder: '采取的处理措施', rows: 4 },
-                    { label: '说明人', type: 'text', placeholder: '说明人签名' }
-                ]
-            },
-            '审查调查安全责任明细表': {
-                fields: [
-                    { label: '填表日期', type: 'date', required: true },
-                    { label: '责任人', type: 'text', placeholder: '主要责任人' },
-                    { label: '安全职责', type: 'textarea', placeholder: '具体安全责任内容', rows: 6 },
-                    { label: '监督人', type: 'text', placeholder: '监督人签名' }
-                ]
-            },
-            '专章总结记录': {
-                fields: [
-                    { label: '结案日期', type: 'date', required: true },
-                    { label: '总结人', type: 'text', required: true },
-                    { label: '安全工作总结', type: 'textarea', placeholder: '审查调查安全工作专章总结', rows: 10 }
-                ]
-            },
-            '谈话录音录像交接表': {
-                fields: [
-                    { label: '交接日期', type: 'date', required: true },
-                    { label: '录音录像编号', type: 'text', required: true },
-                    { label: '移交人', type: 'text', placeholder: '移交人签名' },
-                    { label: '接收人', type: 'text', placeholder: '接收人签名' },
-                    { label: '备注', type: 'textarea', placeholder: '备注信息', rows: 3 }
-                ]
-            }
+
         };
 
         // ==================== Toast 提示 ====================
@@ -1024,9 +885,48 @@
         }
 
         // ==================== 打印 ====================
-        function handlePrint(name) {
-            showToast(`🖨️ 正在准备打印：${name}`);
+        function handlePrint(materialName) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const caseId = urlParams.get('id') || 'new';
+            const encodedName = encodeURIComponent(materialName);
+            window.open(`/print-preview/${caseId}/${encodedName}`, '_blank');
         }
+
+        {#async function handlePrint(materialName) {#}
+        {#    try {#}
+        {#       // 从当前 URL 提取参数#}
+        {#        const path = window.location.pathname;  // /edit-doc/32/6180/测试模板1.docx#}
+        {#        const parts = path.split('/');#}
+        {#        const caseId = parts[2];#}
+        {#        const dirNum = parts[3];#}
+        {#        const filename = decodeURIComponent(parts.slice(4).join('/'));#}
+        {##}
+        {#        // 构建文件路径（和你的后端逻辑一致）#}
+        {#        const filePath = `Edit_Doc/${caseId}/${dirNum}/${filename}`;#}
+        {#        const response = await fetch('/api/print_docx', {#}
+        {#            method: 'POST',#}
+        {#            headers: { 'Content-Type': 'application/json' },#}
+        {#            body: JSON.stringify({ file_path: filePath})#}
+        {#        });#}
+        {##}
+        {#        if (!response.ok) throw new Error('打印失败');#}
+        {##}
+        {#        // 在新窗口打开PDF，自动触发打印#}
+        {#        const blob = await response.blob();#}
+        {#        const url = URL.createObjectURL(blob);#}
+        {#        const printWindow = window.open(url, '_blank');#}
+        {##}
+        {#        // 等待PDF加载完成后自动打印#}
+        {#        printWindow.onload = function() {#}
+        {#            setTimeout(() => {#}
+        {#                printWindow.print();#}
+        {#            }, 1000);#}
+        {#        };#}
+        {##}
+        {#    } catch (error) {#}
+        {#        alert('打印失败：' + error.message);#}
+        {#    }#}
+
 
         // ==================== 销毁所有 Quill 实例 ====================
         function destroyQuillInstances() {
@@ -1208,8 +1108,85 @@
             const urlParams = new URLSearchParams(window.location.search);
             const caseId = urlParams.get('id') || 'new';
             const encodedName = encodeURIComponent(materialName);
-            window.open(`/editor/material?name=${encodedName}&id=${caseId}`, '_blank');
+            {#const group= urlParams.get('group')||'';#}
+            const group = urlParams.get('group') || '';
+            window.location.href = `/editor/material?name=${encodedName}&id=${caseId}&group=${group}`;
         }
+
+        // ==================== 加载案件信息并过滤表格 ====================
+        (function initPage() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const caseId = urlParams.get('id');
+            const group = urlParams.get('group');
+
+            // 1. 填充案件信息
+            if (caseId) {
+                fetch(`/api/cases/${caseId}`)
+                    .then(r => r.json())
+                    .then(c => {
+                        document.getElementById('caseName').value = c.case_name || '';
+                        document.getElementById('subjectName').value = c.subject_name || '';
+                        document.getElementById('unitName').value = c.unit_name || '';
+                    })
+                    .catch(() => {});
+            }
+
+            // 2. 按模版组过滤表格
+            if (!group) return;
+
+            fetch(`/api/group-docs/${group}`)
+                .then(r => r.json())
+                .then(allowedNames => {
+                    if (!allowedNames.length) return;
+                    // 隐藏不在列表中的材料行
+                    const rows = document.querySelectorAll('.catalog-table tbody tr');
+                    rows.forEach(row => {
+                        const nameEl = row.querySelector('.material-name');
+                        if (!nameEl) return;
+                        const matName = nameEl.textContent.trim();
+                        if (!allowedNames.includes(matName)) {
+                            row.style.display = 'none';
+                        }
+                    });
+                    // 更新序号
+                    let seq = 0;
+                    rows.forEach(row => {
+                        if (row.style.display !== 'none') {
+                            seq++;
+                            const seqEl = row.querySelector('.td-seq');
+                            if (seqEl) seqEl.textContent = seq;
+                        }
+                    });
+                    console.log(`[安全卷] 模版组 ${group}，显示 ${seq} 个文档，隐藏 ${rows.length - seq} 个`);
+                    const existingNames = new Set();
+                    rows.forEach(row => {
+                        const nameEl = row.querySelector('.material-name');
+                        if (nameEl) existingNames.add(nameEl.textContent.trim());
+                    });
+
+                    allowedNames.forEach(matName => {
+                        if (!existingNames.has(matName)) {
+                            const tbody = document.querySelector('.catalog-table tbody');
+                            const tr = document.createElement('tr');
+                            seq++;
+                            tr.innerHTML = `
+                                <td class="td-seq">${seq}</td>
+                                <td class="td-content">
+                                    <span class="material-name">${matName}</span>
+                                    <span class="material-note">（用户上传模板）</span>
+                                </td>
+                                <td class="td-status">
+                                    <button class="btn-action btn-edit" onclick="handleEdit('${matName}')">✏️ 编辑</button>
+                                    <button class="btn-action btn-print-item" onclick="handlePrint('${matName}')">🖨️ 打印</button>
+                                    <button class="btn-action btn-edit" style="background:#e8f0fe;border-color:#a0c4e8;color:#2b5a8a;"
+                                            onclick="openOnlyOffice('${matName}')">📄 文档编辑</button>
+                                </td>`;
+                            tbody.appendChild(tr);
+                        }
+                    });
+                })
+                .catch(err => console.error('过滤失败:', err));
+        })();
 
         console.log('✅ 安全卷目录（Quill富文本编辑器版）已就绪');
         console.log('   📋 共 17 项材料，每项配有独立录入表单');

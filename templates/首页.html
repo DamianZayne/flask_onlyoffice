@@ -636,7 +636,7 @@
         }
 
         .modal-dialog.modal-wide {
-            max-width: 780px;
+            max-width: 96vw;
         }
 
         .modal-header {
@@ -931,11 +931,14 @@
             <button class="btn-primary" onclick="openAddModal()">
                 <span class="btn-icon-text">＋</span> 业务新增
             </button>
-            <button class="btn-outline" onclick="openReplaceModal()">
+            <!--button class="btn-outline" onclick="openReplaceModal()">
                 <span class="btn-icon-text">🔄</span> 批量替换
             </button>
             <button class="btn-outline" onclick="openTemplateModal()">
-                <span class="btn-icon-text">⚙️</span> 模板配置
+                <span class="btn-icon-text">📋</span> 安全卷模板
+            </button-->
+            <button class="btn-outline" onclick="openTemplateManageModal()">
+                <span class="btn-icon-text">⚙️</span> 模版管理
             </button>
             <div class="search-box">
                 <span class="search-icon">🔍</span>
@@ -972,41 +975,76 @@
         </div>
     </div>
 
+    <!-- 模版管理弹窗 -->
+    <div class="modal-overlay" id="templateManageModal" style="display:none;" onclick="if(event.target===this)closeTemplateManageModal()">
+        <div class="modal-dialog modal-wide" onclick="event.stopPropagation()" style="max-width:700px;">
+            <div class="modal-header">
+                <span class="modal-title">⚙️ 模版管理</span>
+                <button class="modal-close" onclick="closeTemplateManageModal()">✕</button>
+            </div>
+            <div class="modal-body" style="padding:16px 20px;">
+                <!-- 组标签切换 -->
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+                    <div id="groupTabs" style="display:flex;gap:4px;flex-wrap:wrap;"></div>
+                    <button class="btn-sm btn-sm-edit" onclick="addParamGroup()" style="flex-shrink:0;" title="新增模版组">
+                        <span class="btn-sm-icon">＋</span>
+                    </button>
+                </div>
+
+                <!-- 当前组的模板卡片 -->
+                <div id="activeGroupName" style="font-weight:700;font-size:14px;color:#3d2e1f;margin-bottom:10px;"></div>
+
+                <!-- 拖拽上传区 -->
+                <div id="dropZone" style="border:2px dashed #d5cdc3;border-radius:8px;padding:32px;text-align:center;background:#fefdfb;margin-bottom:12px;cursor:pointer;transition:border-color 0.2s,background 0.2s;"
+                     onclick="document.getElementById('uploadTemplateInput').click()"
+                     ondragover="this.style.borderColor='#8B1A1A';this.style.background='#fdf5ec';event.preventDefault()"
+                     ondragleave="this.style.borderColor='#d5cdc3';this.style.background='#fefdfb'"
+                     ondrop="handleDrop(event)">
+                    <div style="font-size:32px;margin-bottom:6px;">📤</div>
+                    <div style="font-size:14px;color:#5a4d3e;">拖拽 .docx 文件到此处上传</div>
+                    <div style="font-size:11px;color:#999;margin-top:4px;">或点击选择文件</div>
+                </div>
+                <input type="file" id="uploadTemplateInput" accept=".docx" style="display:none" onchange="uploadNewTemplate(this)">
+
+                <!-- 模板卡片列表 -->
+                <div id="templateCardList" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+                <div id="templateEmpty" style="text-align:center;padding:20px;color:#999;font-size:13px;">暂无模板，请上传</div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-confirm" onclick="closeTemplateManageModal()">完成</button>
+            </div>
+        </div>
+    </div>
+
     <!-- 业务新增弹窗 -->
     <div class="modal-overlay" id="addModal" style="display:none;" onclick="if(event.target===this)closeAddModal()">
-        <div class="modal-dialog" onclick="event.stopPropagation()">
+        <div class="modal-dialog modal-wide" onclick="event.stopPropagation()" style="max-height:94vh;">
             <div class="modal-header">
                 <span class="modal-title">📝 业务新增 - 安全卷</span>
                 <button class="modal-close" onclick="closeAddModal()">✕</button>
             </div>
             <div class="modal-body">
-                <div class="form-group-modal">
-                    <label class="form-label-modal">案件名称 <span style="color:#c0392b;">*</span></label>
-                    <input type="text" class="form-input-modal" id="addCaseName" placeholder="请输入案件名称">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+                    <div class="form-group-modal" style="margin-bottom:0;flex:1;">
+                        <label class="form-label-modal">模版组 <span style="font-size:11px;color:#8a7b6b;">（可增删改，每组独立选择文档）</span></label>
+                        <select class="form-input-modal" id="addParamSet" onchange="switchParamSet()" style="max-width:120px;">
+                            <option value="A">A 组</option>
+                            <option value="B">B 组</option>
+                            <option value="C">C 组</option>
+                        </select>
+                    </div>
+                    <span style="font-size:11px;color:#999;margin-top:20px;">模板中用 {'{{'}A1{'}}'} {'{{'}A2{'}}'}... 对应下方字段</span>
                 </div>
-                <div class="form-group-modal">
-                    <label class="form-label-modal">被审查调查人 <span style="color:#c0392b;">*</span></label>
-                    <input type="text" class="form-input-modal" id="addSubjectName" placeholder="请输入被审查调查人姓名">
-                </div>
-                <div class="form-group-modal">
-                    <label class="form-label-modal">办案单位</label>
-                    <input type="text" class="form-input-modal" id="addUnitName" placeholder="请输入办案单位名称">
-                </div>
-                <div class="form-group-modal">
-                    <label class="form-label-modal">立卷人</label>
-                    <input type="text" class="form-input-modal" id="addArchivist" placeholder="立卷人签名">
-                </div>
-                <div class="form-group-modal">
-                    <label class="form-label-modal">状态</label>
-                    <select class="form-input-modal" id="addStatus">
-                        <option value="active">进行中</option>
-                        <option value="done">已结案</option>
-                    </select>
+                <div id="placeholderFields" style="display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;"></div>
+                <div style="margin-top:14px;padding-top:12px;border-top:1.5px solid #e8e0d6;">
+                    <label class="form-label-modal" id="docCheckboxLabel">📄 <span id="docCheckboxGroupName"></span> 模版组包含的文档：</label>
+                    <div id="docCheckboxes" style="display:flex;flex-wrap:wrap;gap:6px 16px;"></div>
                 </div>
             </div>
             <div class="modal-footer">
                 <button class="btn-cancel" onclick="closeAddModal()">取 消</button>
-                <button class="btn-confirm" onclick="confirmAdd()">✓ 确认新增</button>
+                <button class="btn-confirm" onclick="confirmAdd()" style="background:#5a4d3e;">✓ 仅保存记录</button>
+                <button class="btn-confirm" onclick="confirmAddAndReplace()">💾 保存并替换全部文档</button>
             </div>
         </div>
     </div>
@@ -1139,15 +1177,8 @@
             { id: 17, name: '谈话录音录像交接表', note: '', required: false, enabled: true },
         ];
 
-        let caseRecords = [
-            { id: 1, caseName: '×××受贿案', subjectName: '李××', unitName: '××市纪委监委第一审查调查室', archiveDate: '2026-03-15', status: 'active', archivist: '王××', reviewer: '赵××' },
-            { id: 2, caseName: '×××滥用职权案', subjectName: '陈××', unitName: '××市纪委监委第二审查调查室', archiveDate: '2026-04-02', status: 'active', archivist: '刘××', reviewer: '周××' },
-            { id: 3, caseName: '×××贪污案', subjectName: '黄××', unitName: '××区纪委监委', archiveDate: '2026-01-20', status: 'done', archivist: '吴××', reviewer: '郑××' },
-            { id: 4, caseName: '×××违纪违法案', subjectName: '林××', unitName: '××市纪委监委第三审查调查室', archiveDate: '2026-05-10', status: 'active', archivist: '孙××', reviewer: '钱××' },
-            { id: 5, caseName: '×××失职渎职案', subjectName: '杨××', unitName: '××县纪委监委', archiveDate: '2025-11-08', status: 'done', archivist: '马××', reviewer: '朱××' },
-        ];
-
-        let nextId = 6;
+        let caseRecords = [];  // 从 API 加载
+        let _editCaseId = null;  // 编辑模式下记录当前案件 ID
         let templateConfig = JSON.parse(JSON.stringify(defaultTemplateItems));
         let deleteTargetId = null;
 
@@ -1195,16 +1226,19 @@
                 return `
                     <tr>
                         <td class="td-seq">${index + 1}</td>
-                        <td class="td-name">${escapeHtml(record.caseName)}</td>
-                        <td class="td-person">${escapeHtml(record.subjectName)}</td>
-                        <td class="td-unit">${escapeHtml(record.unitName) || '—'}</td>
-                        <td>${record.archiveDate || '—'}</td>
+                        <td class="td-name">${escapeHtml(record.case_name)}</td>
+                        <td class="td-person">${escapeHtml(record.subject_name)}</td>
+                        <td class="td-unit">${escapeHtml(record.unit_name) || '—'}</td>
+                        <td>${record.archive_date || '—'}</td>
                         <td>${statusHtml}</td>
                         <td>
                             <div class="table-actions">
                                 ${mainActionBtn}
-                                <button class="btn-sm btn-sm-delete" onclick="openDeleteModal(${record.id})" title="删除该记录">
-                                    <span class="btn-sm-icon">🗑️</span> 删除
+                                <button class="btn-sm btn-sm-edit" onclick="openAddModal(${record.id})" title="编辑占位符" style="background:#e8f0fe;border-color:#a0c4e8;color:#2b5a8a;">
+                                    <span class="btn-sm-icon">📝</span> 占位符
+                                </button>
+                                <button class="btn-sm btn-sm-delete" onclick="openDeleteModal(${record.id})" title="删除">
+                                    <span class="btn-sm-icon">🗑️</span>
                                 </button>
                             </div>
                         </td>
@@ -1238,58 +1272,271 @@
                 return;
             }
             const filtered = caseRecords.filter(r =>
-                r.caseName.toLowerCase().includes(keyword) ||
-                r.subjectName.toLowerCase().includes(keyword) ||
-                (r.unitName && r.unitName.toLowerCase().includes(keyword))
+                r.case_name.toLowerCase().includes(keyword) ||
+                r.subject_name.toLowerCase().includes(keyword) ||
+                (r.unit_name && r.unit_name.toLowerCase().includes(keyword))
             );
             renderTable(filtered);
         }
 
         // ==================== 新窗口编辑/查看 ====================
         function openEditor(recordId) {
-            window.open(`/security-catalog?id=${recordId}`, '_blank');
+            // 找到该案件使用的模版组
+            const rec = caseRecords.find(r => r.id === recordId);
+            const group = (rec && rec.active_group) || _paramGroups[0] || 'A';
+
+            {#if (rec && rec.placeholders) {#}
+            {#    // 找第一个有值的组#}
+            {#    for (const g of _paramGroups) {#}
+            {#        const vals = rec.placeholders[g] || {};#}
+            {#        if (Object.keys(vals).length > 0) { activeGroup = g; break; }#}
+            {#    }#}
+            {#}#}
+            const params = `id=${recordId}&group=${group}`;
+            window.location.href = `/security-catalog?${params}`;
         }
 
         function openViewer(recordId) {
-            window.open(`安全卷录入.html?id=${recordId}`, '_blank');
+            openEditor(recordId);
+        }
+
+        async function openEditCase(recordId) {
+            openAddModal(recordId);
+        }
+
+        // ==================== 占位符字段定义 ====================
+        const PLACEHOLDER_FIELDS = [
+            {label:'案卷名称', type:'text', placeholder:'案卷名称'},//1
+            {label:'案卷编号', type:'text', placeholder:'案卷编号'},//2
+            {label:'谈话对象', type:'text', placeholder:'谈话对象姓名'},//3
+            {label:'证件号码', type:'text', placeholder:'证件号码'},//4
+            {label:'性别', type:'select', options:['男','女']},//5
+            {label:'年龄', type:'text', placeholder:'年龄'},//6
+            {label:'民族', type:'text', placeholder:'民族'},//7
+            {label:'学历', type:'text', placeholder:'学历'},//8
+            {label:'政治面貌', type:'text', placeholder:'政治面貌'},//9
+            {label:'单位及职务', type:'text', placeholder:'单位及职务'},//10
+            {label:'事由', type:'text', placeholder:'事由'},//11
+            {label:'谈话对象基本信息', type:'textarea', placeholder:'谈话对象基本信息'},//12
+            {label:'承办部门', type:'text', placeholder:'承办部门'},//13
+            {label:'时间', type:'text', placeholder:'时间'},//14
+        ];
+
+        function getFieldCode(idx) { return 'A' + (idx + 1); }
+
+        function buildPlaceholderFields() {
+            const container = document.getElementById('placeholderFields');
+            let html = '';
+            PLACEHOLDER_FIELDS.forEach((f, i) => {
+                const code = getFieldCode(i);
+                const fid = `ph_f_${i}`;
+                let inputHtml;
+                if (f.type === 'select') {
+                    inputHtml = `<select class="form-input-modal add-placeholder" id="${fid}" data-code="${code}" style="font-size:13px;">${(f.options||[]).map(o=>`<option value="${o}">${o}</option>`).join('')}</select>`;
+                } else if (f.type === 'textarea') {
+                    inputHtml = `<textarea class="form-input-modal add-placeholder" id="${fid}" data-code="${code}" placeholder="${f.placeholder||''}" rows="2" style="font-size:13px;resize:vertical;"></textarea>`;
+                } else {
+                    inputHtml = `<input type="text" class="form-input-modal add-placeholder" id="${fid}" data-code="${code}" placeholder="${f.placeholder||''}" style="font-size:13px;">`;
+                }
+                html += `<div style="display:flex;align-items:center;gap:6px;">
+                    <label style="font-size:13px;color:#4a3f35;white-space:nowrap;min-width:100px;text-align:right;">${f.label}</label>
+                    <code style="font-size:10px;color:#999;background:#f0ede6;padding:1px 4px;border-radius:2px;min-width:24px;text-align:center;" class="field-code-label">${code}</code>
+                    ${inputHtml}
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        // ==================== 模版组管理 ====================
+        let _paramSetCache = {};   // { A: {A1:val, A2:val...}, B: {B1:val, B2:val...}, C: {...} }
+        let _currentParamSet = 'A';
+
+        function currentParamSet() { return document.getElementById('addParamSet').value; }
+
+        function collectPlaceholderValues() {
+            const vals = {};
+            document.querySelectorAll('.add-placeholder').forEach(el => {
+                const code = el.getAttribute('data-code');
+                const val = el.value.trim();
+                if (code && val) vals[code] = val;
+            });
+            return vals;
+        }
+
+        function setPlaceholderValues(vals) {
+            document.querySelectorAll('.add-placeholder').forEach(el => {
+                const code = el.getAttribute('data-code');
+                if (code && vals[code] !== undefined) el.value = vals[code];
+            });
+        }
+
+        function switchParamSet() {
+            _paramSetCache[_currentParamSet] = collectPlaceholderValues();
+            _currentParamSet = currentParamSet();
+            buildDocCheckboxes();
+            const saved = _paramSetCache[_currentParamSet] || {};
+            if (Object.keys(saved).length > 0) {
+                setPlaceholderValues(saved);
+            } else {
+                document.querySelectorAll('.add-placeholder').forEach(el => el.value = '');
+            }
+        }
+
+        function collectAllPlaceholders() {
+            _paramSetCache[_currentParamSet] = collectPlaceholderValues();
+            const result = {};
+            _paramGroups.forEach(g => { result[g] = { ...(_paramSetCache[g] || {}) }; });
+            return result;
+        }
+
+        function getActivePlaceholders() {
+            _paramSetCache[_currentParamSet] = collectPlaceholderValues();
+            return _paramSetCache[_currentParamSet] || {};
         }
 
         // ==================== 业务新增 ====================
-        function openAddModal() {
+        async function openAddModal(recordId) {
+            _editCaseId = recordId || null;
+            _paramSetCache = {};
+            _paramGroups.forEach(g => { _paramSetCache[g] = {}; });
+            _currentParamSet = _paramGroups[0] || 'A';
+
+            if (recordId) {
+                try {
+                    const resp = await fetch(`/api/cases/${recordId}`);
+                    if (resp.ok) {
+                        const c = await resp.json();
+                        if (c.placeholders) {
+                            _paramGroups.forEach(g => {
+                                _paramSetCache[g] = (c.placeholders[g] || {});
+                            });
+                        }
+                    }
+                } catch (err) { console.error('加载失败:', err); }
+            }
+
             document.getElementById('addModal').style.display = 'flex';
-            document.getElementById('addCaseName').value = '';
-            document.getElementById('addSubjectName').value = '';
-            document.getElementById('addUnitName').value = '';
-            document.getElementById('addArchivist').value = '';
-            document.getElementById('addStatus').value = 'active';
-            document.getElementById('addCaseName').focus();
+            updateGroupDropdown();
+            document.getElementById('addParamSet').value = _paramGroups[0];
+            _currentParamSet = _paramGroups[0];
+            buildPlaceholderFields();
+            buildDocCheckboxes();
+            setTimeout(() => {
+                const vals = _paramSetCache[_paramGroups[0]] || {};
+                if (Object.keys(vals).length > 0) setPlaceholderValues(vals);
+            }, 100);
+            document.getElementById('addParamSet').focus();
         }
         function closeAddModal() { document.getElementById('addModal').style.display = 'none'; }
-        function confirmAdd() {
-            const caseName = document.getElementById('addCaseName').value.trim();
-            const subjectName = document.getElementById('addSubjectName').value.trim();
-            const unitName = document.getElementById('addUnitName').value.trim();
-            const archivist = document.getElementById('addArchivist').value.trim();
-            const status = document.getElementById('addStatus').value;
 
-            if (!caseName) { showToast('请输入案件名称', 'error'); return; }
-            if (!subjectName) { showToast('请输入被审查调查人姓名', 'error'); return; }
-
-            const newRecord = {
-                id: nextId++,
-                caseName,
-                subjectName,
-                unitName: unitName || '—',
-                archiveDate: new Date().toISOString().split('T')[0],
-                status,
-                archivist: archivist || '—',
+        function collectCaseFormData() {
+            _paramSetCache[_currentParamSet] = collectPlaceholderValues();
+            const firstGroup = _paramGroups[0] || 'A';
+            {#const vals = _paramSetCache[firstGroup] || {};#}
+            {#const vals = _paramSetCache[_currentParamSet] || {};#}
+            const vals = _paramSetCache[_currentParamSet] || {};
+            {#activeGroup: _currentParamSet || _paramGroups[0]#}
+            return {
+                caseName: vals['A1'] || '',
+                subjectName: vals['A3'] || '',   // 谈话对象
+                unitName: vals['A13'] || '',      // 承办部门
+                archivist: '',
+                status: 'active',
+                archiveDate: vals['A14'] || new Date().toISOString().split('T')[0],
                 reviewer: '—',
+                active_group: _currentParamSet || _paramGroups[0],
+                placeholders: { ..._paramSetCache },
+
             };
-            caseRecords.unshift(newRecord);
-            closeAddModal();
-            renderTable(caseRecords);
-            document.getElementById('searchInput').value = '';
-            showToast('✅ 安全卷新增成功！', 'success');
+        }
+
+        async function saveCaseToApi(data) {
+            if (_editCaseId) {
+                return fetch(`/api/cases/${_editCaseId}`, {
+                    method: 'PUT',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data),
+                });
+            } else {
+                const resp = await fetch('/api/cases', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data),
+                });
+                const r = await resp.json();
+                _editCaseId = r.id;
+                return resp;
+            }
+        }
+
+        async function confirmAdd() {
+            const data = collectCaseFormData();
+            try {
+                await saveCaseToApi(data);
+                closeAddModal();
+                await loadCases();
+                showToast('✅ 安全卷保存成功！', 'success');
+            } catch (err) {
+                showToast('❌ 保存失败: ' + err.message, 'error');
+            }
+        }
+
+        async function confirmAddAndReplace() {
+            const data = collectCaseFormData();
+            try {
+                await saveCaseToApi(data);
+            } catch (err) {
+                showToast('❌ 保存失败: ' + err.message, 'error');
+                return;
+            }
+            const activeSet = currentParamSet();
+
+            // 直接从表单收集，不走缓存
+            const vals = {};
+            document.querySelectorAll('.add-placeholder').forEach(el => {
+                const code = el.getAttribute('data-code');
+                const val = el.value.trim();
+                if (code && val) vals[code] = val;
+            });
+
+            if (Object.keys(vals).length === 0) {
+                showToast(`请先在模版组 ${activeSet} 中填写占位符`, 'error');
+                return;
+            }
+
+            // 构建替换映射：{{A1}} → 值
+            const L = String.fromCharCode(123), R = String.fromCharCode(125);
+            const replacements = {};
+            for (const [key, val] of Object.entries(vals)) {
+                replacements[L + L + key + R + R] = val;
+            }
+
+            const btn = document.querySelector('#addModal .btn-confirm:last-child');
+            const origText = btn.textContent;
+            btn.textContent = '替换中…';
+            btn.disabled = true;
+
+            try {
+                const resp = await fetch('/api/replace-from-temp', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ replacements, set: activeSet, case_id: _editCaseId }),
+                });
+                const result = await resp.json();
+                if (result.error === 0) {
+                    closeAddModal();
+                    await loadCases();
+                    document.getElementById('searchInput').value = '';
+                    showToast(`✅ 已保存！模版组 ${activeSet} → ${result.message}`, 'success');
+                } else {
+                    showToast('❌ ' + result.message, 'error');
+                }
+            } catch (err) {
+                showToast('❌ 请求失败: ' + err.message, 'error');
+            } finally {
+                btn.textContent = origText;
+                btn.disabled = false;
+            }
         }
 
         // ==================== 模板配置 ====================
@@ -1324,17 +1571,18 @@
             deleteTargetId = recordId;
             const record = caseRecords.find(r => r.id === recordId);
             if (record) {
-                document.getElementById('deleteMessage').textContent = `确定要删除「${record.caseName}」的安全卷记录吗？此操作不可恢复。`;
+                document.getElementById('deleteMessage').textContent = `确定要删除「${record.case_name}」的安全卷记录吗？此操作不可恢复。`;
             }
             document.getElementById('deleteModal').style.display = 'flex';
         }
         function closeDeleteModal() { document.getElementById('deleteModal').style.display = 'none'; deleteTargetId = null; }
-        document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+        document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
             if (deleteTargetId !== null) {
-                caseRecords = caseRecords.filter(r => r.id !== deleteTargetId);
+                try {
+                    await fetch(`/api/cases/${deleteTargetId}`, { method: 'DELETE' });
+                } catch (err) { console.error(err); }
                 closeDeleteModal();
-                renderTable(caseRecords);
-                document.getElementById('searchInput').value = '';
+                await loadCases();
                 showToast('🗑️ 记录已删除', 'info');
             }
         });
@@ -1364,11 +1612,7 @@
         // ==================== 退出 ====================
         function handleLogout() {
             if (confirm('确定要退出系统吗？')) {
-                showToast('👋 正在安全退出…', 'info');
-                setTimeout(() => {
-                    showToast('已安全退出，请重新登录', 'info');
-                    setTimeout(() => location.reload(), 1500);
-                }, 600);
+                window.location.href = '/login';
             }
         }
 
@@ -1462,14 +1706,324 @@
             }
         }
 
+        let _activeManageGroup = 'A';
+
+        function openTemplateManageModal() {
+            _activeManageGroup = _paramGroups[0] || 'A';
+            document.getElementById('templateManageModal').style.display = 'flex';
+            renderTemplateManage();
+        }
+        function closeTemplateManageModal() {
+            document.getElementById('templateManageModal').style.display = 'none';
+        }
+
+        function switchManageGroup(g) {
+            _activeManageGroup = g;
+            renderTemplateManage();
+        }
+
+        function renderTemplateManage() {
+            // 渲染组标签
+            const tabs = document.getElementById('groupTabs');
+            tabs.innerHTML = _paramGroups.map(g => {
+                const active = g === _activeManageGroup;
+                const bg = active ? '#8B1A1A' : '#fff';
+                const color = active ? '#fff' : '#5a4d3e';
+                return `<div style="display:flex;align-items:center;gap:2px;">
+                    <button onclick="switchManageGroup('${g}')"
+                        style="padding:6px 18px;border-radius:6px 0 0 6px;border:1.5px solid ${active?'#8B1A1A':'#d5cdc3'};background:${bg};color:${color};cursor:pointer;font-weight:600;font-size:13px;">
+                        ${g} 组</button>
+                    <button onclick="event.stopPropagation();renameParamGroup('${g}')"
+                        style="padding:6px 8px;border:1.5px solid ${active?'#8B1A1A':'#d5cdc3'};border-left:none;background:${bg};color:${color};cursor:pointer;font-size:11px;"
+                        title="重命名">✏️</button>
+                    ${_paramGroups.length > 1 ? `<button onclick="event.stopPropagation();deleteParamGroup('${g}')"
+                        style="padding:6px 8px;border:1.5px solid ${active?'#8B1A1A':'#d5cdc3'};border-left:none;border-radius:0 6px 6px 0;background:${bg};color:${color};cursor:pointer;font-size:11px;"
+                        title="删除">✕</button>` : `<span style="width:28px;"></span>`}
+                </div>`;
+            }).join('');
+
+            // 当前组名
+            document.getElementById('activeGroupName').textContent = '📁 ' + _activeManageGroup + ' 组的模板';
+
+            // 模板卡片
+            const groupDocs = _availableDocs[_activeManageGroup] || [];
+            const selDocs = _docSelections[_activeManageGroup] || [];
+            const cardList = document.getElementById('templateCardList');
+            const empty = document.getElementById('templateEmpty');
+
+            if (groupDocs.length === 0) {
+                cardList.innerHTML = '';
+                empty.style.display = 'block';
+            } else {
+                empty.style.display = 'none';
+                cardList.innerHTML = groupDocs.map(fn => {
+                    const checked = selDocs.includes(fn) ? 'checked' : '';
+                    return `<div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:#fefdfb;border:1.5px solid #e8e0d6;border-radius:8px;">
+                        <input type="checkbox" ${checked} onchange="toggleDocFromPanel('${_activeManageGroup}','${fn}',this.checked)" style="accent-color:#8B1A1A;">
+                        <span style="font-size:13px;font-weight:500;flex:1;">${getDocShortName(fn)}</span>
+                        <span onclick="event.stopPropagation();deleteTemplate('${fn}')" style="cursor:pointer;color:#c0392b;font-size:14px;" title="删除模板">🗑️</span>
+                    </div>`;
+                }).join('');
+            }
+
+            // 同步更新业务新增弹窗的下拉框
+            updateGroupDropdown();
+        }
+
+        // ==================== 模版组管理 ====================
+        let _paramGroups = ['A', 'B', 'C'];
+        let _docSelections = { A: [], B: [], C: [] };  // { group: [filename1, filename2...] }
+        let _availableDocs = {};  // {A: [fn1, fn2...], B: [...], ...}
+        async function loadTemplates() {
+            // 加载所有组的模板
+            for (const g of _paramGroups) {
+                try {
+                    const resp = await fetch('/api/templates?group=' + g);
+                    _availableDocs[g] = await resp.json();
+                } catch (e) { _availableDocs[g] = []; }
+            }
+        }
+        function getDocShortName(fn) {
+            return fn.replace(/\.docx$/, '');
+        }
+
+        async function deleteTemplate(filename) {
+            if (!confirm(`确定删除模板 "${getDocShortName(filename)}"？此操作不可恢复。`)) return;
+            try {
+                const resp = await fetch('/api/templates/' + encodeURIComponent(filename), { method: 'DELETE' });
+                const r = await resp.json();
+                if (r.error === 0) {
+                    await loadTemplates();
+                    for (const g of _paramGroups) {
+                        if (_docSelections[g]) _docSelections[g] = _docSelections[g].filter(f => f !== filename);
+                    }
+                    await saveParamGroups();
+                    renderTemplateManage();
+                    showToast('🗑️ 模板已删除', 'info');
+                }
+            } catch (e) { showToast('❌ 删除失败', 'error'); }
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.target.style.borderColor = '#d5cdc3';
+            e.target.style.background = '#fefdfb';
+            const file = e.dataTransfer.files[0];
+            if (file) {
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                document.getElementById('uploadTemplateInput').files = dt.files;
+                uploadNewTemplate(document.getElementById('uploadTemplateInput'));
+            }
+        }
+
+        async function uploadNewTemplate(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const form = new FormData();
+            form.append('file', file);
+            form.append('group', _activeManageGroup || _paramGroups[0]);
+            try {
+                const resp = await fetch('/api/templates/upload', { method: 'POST', body: form });
+                const r = await resp.json();
+                if (r.error === 0) {
+                    // 重新加载所有组的模板列表
+                    await loadTemplates();
+                    const uploadGroup = _activeManageGroup || _paramGroups[0];
+                    if (!_docSelections[uploadGroup]) _docSelections[uploadGroup] = [];
+                    if (!_docSelections[uploadGroup].includes(r.filename)) {
+                        _docSelections[uploadGroup].push(r.filename);
+                    }
+                    await saveParamGroups();
+                    renderTemplateManage();
+                    showToast('✅ 模板已上传: ' + r.filename, 'success');
+                } else {
+                    showToast('❌ ' + r.message, 'error');
+                }
+            } catch (e) { showToast('❌ 上传失败', 'error'); }
+            input.value = '';
+        };
+
+        async function loadParamGroups() {
+            try {
+                await loadTemplates();
+                const resp = await fetch('/api/param-groups');
+                const data = await resp.json();
+                _paramGroups = data.groups || ['A', 'B', 'C'];
+                _docSelections = data.doc_selections || {};
+                // 确保每个组都有默认全选
+                _paramGroups.forEach(g => {
+                    if (!_docSelections[g]) _docSelections[g] = [...(_availableDocs[g] || [])];
+                });
+            } catch (e) { console.error('加载模版组失败:', e); }
+            renderTemplateManage(); updateGroupDropdown();
+        }
+
+        async function saveParamGroups() {
+            await fetch('/api/param-groups', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ groups: _paramGroups, doc_selections: _docSelections }),
+            });
+        }
+
+        function toggleDocFromPanel(group, filename, checked) {
+            if (!_docSelections[group]) _docSelections[group] = [...(_availableDocs[group] || [])];
+            if (checked) {
+                if (!_docSelections[group].includes(filename)) _docSelections[group].push(filename);
+            } else {
+                _docSelections[group] = _docSelections[group].filter(f => f !== filename);
+            }
+            saveParamGroups().then(renderTemplateManage);
+        }
+
+        function updateGroupDropdown() {
+            const select = document.getElementById('addParamSet');
+            if (select) {
+                const currentVal = select.value;
+                select.innerHTML = _paramGroups.map(g =>
+                    `<option value="${g}" ${g === currentVal ? 'selected' : ''}>${g} 组</option>`
+                ).join('');
+            }
+            // 同步更新模版管理弹窗的组选择器
+            const tmSel = document.getElementById('templateManageGroupSelect');
+            if (tmSel) {
+                const cur = tmSel.value || _paramGroups[0];
+                tmSel.innerHTML = _paramGroups.map(g =>
+                    `<option value="${g}" ${g === cur ? 'selected' : ''}>${g} 组</option>`
+                ).join('');
+            }
+        }
+
+        function buildDocCheckboxes() {
+            const container = document.getElementById('docCheckboxes');
+            const group = currentParamSet();
+            const groupDocs = _availableDocs[group] || [];
+            const selected = _docSelections[group] || groupDocs;
+            const label = document.getElementById('docCheckboxGroupName');
+            if (label) label.textContent = group;
+            container.innerHTML = selected.map(fn =>
+                `<span style="display:inline-block;font-size:12px;padding:2px 8px;margin:2px 4px;background:#f0ede6;border-radius:4px;color:#5a4d3e;">${getDocShortName(fn) || fn}</span>`
+            ).join('');
+        }
+
+        function toggleDocSelection(filename, checked) {
+            const group = currentParamSet();
+            if (!_docSelections[group]) _docSelections[group] = [...(_availableDocs[group] || [])];
+            if (checked) {
+                if (!_docSelections[group].includes(filename)) _docSelections[group].push(filename);
+            } else {
+                _docSelections[group] = _docSelections[group].filter(f => f !== filename);
+            }
+            // 更新面板计数
+            saveParamGroups().then(renderTemplateManage);
+        }
+        function updateGroupTabs() {
+            const container = document.getElementById('groupTabs');
+            if (!container) return;
+
+            container.innerHTML = _paramGroups.map(group => `
+                <button class="tab-btn ${group === _currentParamSet ? 'active' : ''}"
+                        onclick="switchParamGroup('${group}')"
+                        style="padding:4px 12px;border:1px solid #ddd;border-radius:4px;cursor:pointer;background:${group === _currentParamSet ? '#007bff' : '#fff'};color:${group === _currentParamSet ? '#fff' : '#333'};">
+                    ${group}
+                </button>
+            `).join('');
+        }
+
+        async function addParamGroup() {
+            const name = prompt('请输入新模版组名称（如 D、E...）：');
+            if (!name || !name.trim()) return;
+            const trimmed = name.trim().toUpperCase();
+            if (_paramGroups.includes(trimmed)) { showToast(`模版组 ${trimmed} 已存在`, 'error'); return; }
+            _paramGroups.push(trimmed);
+            _docSelections[trimmed] = [..._availableDocs];
+            await saveParamGroups();
+             // ✅ 关键：如果弹窗是打开状态，立即刷新弹窗内容
+            const modal = document.getElementById('addModal');
+            if (modal && modal.style.display === 'flex') {
+                _currentParamSet = trimmed;
+                buildPlaceholderFields();        // 重新构建字段
+                updateGroupDropdown();           // 更新下拉
+                updateGroupTabs();               // 更新标签页（需要实现）
+
+                // 填充数据（如果有缓存）
+                setTimeout(() => {
+                    const vals = _paramSetCache[trimmed] || {};
+                    if (Object.keys(vals).length > 0) setPlaceholderValues(vals);
+                }, 100);
+            }
+            _activeManageGroup = trimmed;
+            renderTemplateManage(); updateGroupDropdown();
+            showToast(`✅ 模版组 ${trimmed} 已添加`, 'success');
+            // 自动打开上传对话框
+            setTimeout(() => document.getElementById('uploadTemplateInput').click(), 300);
+        }
+
+        async function renameParamGroup(oldName) {
+            const newName = prompt(`重命名模版组 "${oldName}"：`, oldName);
+            if (!newName || !newName.trim() || newName.trim() === oldName) return;
+            const trimmed = newName.trim().toUpperCase();
+            if (_paramGroups.includes(trimmed)) { showToast(`模版组 ${trimmed} 已存在`, 'error'); return; }
+            const idx = _paramGroups.indexOf(oldName);
+            _paramGroups[idx] = trimmed;
+            _docSelections[trimmed] = _docSelections[oldName] || [...(_availableDocs[trimmed] || [])];
+            delete _docSelections[oldName];
+            // 更新缓存的键名
+            const newCache = {};
+            for (const [k, v] of Object.entries(_paramSetCache)) {
+                newCache[k === oldName ? trimmed : k] = v;
+            }
+            Object.assign(_paramSetCache, newCache);
+            if (_currentParamSet === oldName) _currentParamSet = trimmed;
+            await saveParamGroups();
+            updateGroupDropdown();
+            renderTemplateManage(); updateGroupDropdown();
+            showToast(`✅ 已重命名为 ${trimmed}`, 'success');
+        }
+
+        async function deleteParamGroup(oldName) {
+            if (!confirm(`确定删除模版组 "${oldName}"？将同时删除该组所有模板文件！`)) return;
+            if (_paramGroups.length <= 1) { showToast('至少保留一个模版组', 'error'); return; }
+
+            // 新增：调用 API 删除文件夹
+            try {
+                await fetch('/api/param-groups/' + oldName + '/folder', { method: 'DELETE' });
+            } catch (e) { console.error('删除文件夹失败:', e); }
+
+            // 原有逻辑
+            _paramGroups = _paramGroups.filter(g => g !== oldName);
+            delete _docSelections[oldName];
+            delete _availableDocs[oldName];
+            delete _paramSetCache[oldName];
+            if (_currentParamSet === oldName) _currentParamSet = _paramGroups[0];
+            await saveParamGroups();
+            updateGroupDropdown();
+            renderTemplateManage();
+            if (document.getElementById('addModal').style.display === 'flex') {
+                document.getElementById('addParamSet').value = _paramGroups[0];
+                buildDocCheckboxes();
+    }
+    showToast(`🗑️ 模版组 ${oldName} 及文件已删除`, 'info');
+        }
+
         // ==================== 初始化 ====================
-        function init() {
-            document.getElementById('displayUserName').textContent = currentUser.name;
+        async function loadCases() {
+            try {
+                const resp = await fetch('/api/cases');
+                caseRecords = await resp.json();
+            } catch (err) { console.error('加载案件失败:', err); }
             renderTable(caseRecords);
+        }
+
+        async function init() {
+            document.getElementById('displayUserName').textContent = currentUser.name;
+            await loadParamGroups();
+            await loadCases();
         }
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
-                closeAddModal(); closeTemplateModal(); closeDeleteModal(); closePasswordModal(); closeReplaceModal();
+                closeAddModal(); closeTemplateModal(); closeDeleteModal(); closePasswordModal(); closeReplaceModal(); closeTemplateManageModal();
             }
             if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
                 e.preventDefault();
@@ -1477,6 +2031,8 @@
             }
         });
         init();
+
+
     </script>
 </body>
 </html>
