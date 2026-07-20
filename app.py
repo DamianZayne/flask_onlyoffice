@@ -106,7 +106,8 @@ def init_db():
             archive_date TEXT DEFAULT '',
             status TEXT DEFAULT 'active',
             reviewer TEXT DEFAULT '',
-            created_at TEXT DEFAULT ''
+            created_at TEXT DEFAULT '',
+            active_group TEXT DEFAULT 'A'
         )
     """)
     db.execute("""
