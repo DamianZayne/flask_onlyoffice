@@ -37,7 +37,7 @@ jobs:
             --hidden-import=flask `
             --hidden-import=jinja2 `
             --clean `
-            --noconsole `
+            --console `
             app.py
 
       - name: Package portable folder

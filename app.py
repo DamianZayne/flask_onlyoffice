@@ -138,7 +138,7 @@ init_db()
 
 # ── 材料名 → Edit_Doc 目录映射 ────────────────────────────────
 EDIT_DOC_DIR = BASE_DIR / "Edit_Doc"
-
+EDIT_DOC_DIR.mkdir(exist_ok=True)
 
 # ── 元数据 ────────────────────────────────────────────────────
 def load_meta():
