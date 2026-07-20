@@ -150,10 +150,10 @@ def save_meta(meta):
     META_FILE.write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
-# ── SDK 静态资源 ──────────────────────────────────────────────
-@app.route("/packages/<path:filename>")
-def serve_packages(filename):
-    return send_from_directory(BASE_DIR / "static" / "packages", filename)#安全地发送静态文件的函数，从指定目录安全地提供文件下载
+# ── SDK 静态资源（OnlyOffice 离线编辑器已禁用）────────────────
+# @app.route("/packages/<path:filename>")
+# def serve_packages(filename):
+#     return send_from_directory(BASE_DIR / "static" / "packages", filename)
 
 
 # ── 业务页面 ──────────────────────────────────────────────────
@@ -176,10 +176,9 @@ def security_catalog():
     return render_template("安全卷录入.html")
 
 
-# ── OnlyOffice 编辑器 ──────────────    ───────────────────────────
+# ── OnlyOffice 编辑器（已禁用）──────────────────────
+'''
 
-@app.route("/editor/<doc_id>")
-def edit_doc(doc_id):
     """编辑已上传的文档"""
     meta = load_meta()
     info = meta.get(doc_id)
@@ -268,32 +267,6 @@ def serve_edit_case_doc(case_id, dir_num, filename):
                      mimetype=MIME_MAP.get(ext, "application/octet-stream"))
 
 
-@app.route("/api/open-in-office",methods=["POST"])
-def open_in_office():
-   data=request.get_json()
-   case_id=data.get("case_id")
-   material_name=data.get("material_name")
-   case_root=EDIT_DOC_DIR / str(case_id)
-   filepath=None
-   if case_root.exists():
-       for d in case_root.iterdir():
-           if d.is_dir():
-               for f in d.glob("*"):
-                   if get_material_display_name(f.name)==material_name or f.stem==material_name:
-                       filepath=f
-                       break
-               if filepath:
-                   break
-   if not filepath or not filepath.exists():
-       return jsonify({"error": 1, "message": "未找到文档"})
-   path_str=str(filepath)
-   if platform.system()=="Windows":
-       os.startfile(path_str)
-   elif platform.system()=="Darwin":
-       subprocess.Popen(["open", path_str])
-   else :
-       subprocess.Popen(["xdg-open", path_str])
-   return jsonify({"error": 0,"data": {"path": path_str},"message": "已打开文档"})
 
 
 
@@ -350,6 +323,34 @@ def save_edit_case_doc(case_id, dir_num, filename):
     target.write_bytes(request.get_data())
     print(f"[save-edit-doc] case={case_id} dir={dir_num}: {target}")
     return jsonify({"error": 0})
+'''
+@app.route("/api/open-in-office",methods=["POST"])
+def open_in_office():
+   data=request.get_json()
+   case_id=data.get("case_id")
+   material_name=data.get("material_name")
+   case_root=EDIT_DOC_DIR / str(case_id)
+   filepath=None
+   if case_root.exists():
+       for d in case_root.iterdir():
+           if d.is_dir():
+               for f in d.glob("*"):
+                   if get_material_display_name(f.name)==material_name or f.stem==material_name:
+                       filepath=f
+                       break
+               if filepath:
+                   break
+   if not filepath or not filepath.exists():
+       return jsonify({"error": 1, "message": "未找到文档"})
+   path_str=str(filepath)
+   if platform.system()=="Windows":
+       os.startfile(path_str)
+   elif platform.system()=="Darwin":
+       subprocess.Popen(["open", path_str])
+   else :
+       subprocess.Popen(["xdg-open", path_str])
+   return jsonify({"error": 0,"data": {"path": path_str},"message": "已打开文档"})
+
 
 
 # ── 模板替换（全部来自用户上传）─────────────────────────────
