@@ -2,7 +2,8 @@
 智慧办案助手 — Flask 应用
 支持 OnlyOffice 离线文档编辑
 """
-
+import platform
+import  subprocess
 import json
 import os
 import re
@@ -265,6 +266,36 @@ def serve_edit_case_doc(case_id, dir_num, filename):
     ext = filename.rsplit(".", 1)[-1].lower() if "." in filename else "docx"
     return send_file(filepath, as_attachment=False,
                      mimetype=MIME_MAP.get(ext, "application/octet-stream"))
+
+
+@app.route("/api/open-in-office",methods=["POST"])
+def open_in_office():
+   data=request.get_json()
+   case_id=data.get("case_id")
+   material_name=data.get("material_name")
+   case_root=EDIT_DOC_DIR / str(case_id)
+   filepath=None
+   if case_root.exists():
+       for d in case_root.iterdir():
+           if d.is_dir():
+               for f in d.glob("*"):
+                   if get_material_display_name(f.name)==material_name or f.stem==material_name:
+                       filepath=f
+                       break
+               if filepath:
+                   break
+   if not filepath or not filepath.exists():
+       return jsonify({"error": 1, "message": "未找到文档"})
+   path_str=str(filepath)
+   if platform.system()=="Windows":
+       os.startfile(path_str)
+   elif platform.system()=="Darwin":
+       subprocess.Popen(["open", path_str])
+   else :
+       subprocess.Popen(["xdg-open", path_str])
+   return jsonify({"error": 0,"data": {"path": path_str},"message": "已打开文档"})
+
+
 
 
 # ── 文档 API ─────────────────────────────────────────────────
@@ -941,10 +972,10 @@ def delete_case(case_id):
 
 # ── 启动 ──────────────────────────────────────────────────────
 if __name__ == "__main__":
-    import sys
-    port = int(sys.argv[1]) if len(sys.argv) > 1 else 5050
-    print("=" * 60)
-    print("  智慧办案助手 - 离线版")
-    print(f"  访问: http://localhost:{port}")
-    print("=" * 60)
-    app.run(host="0.0.0.0", port=port, debug=True)
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--host', default='0.0.0.0', help='绑定IP')
+    parser.add_argument('--port', type=int, default=5050, help='绑定端口')
+    args = parser.parse_args()
+    app.run(debug=True, host=args.host, port=args.port)
